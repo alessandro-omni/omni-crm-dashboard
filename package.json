@@ -12,6 +12,7 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "papaparse": "^5.5.3",
+    "pptxgenjs": "^4.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "recharts": "^3.7.0"
