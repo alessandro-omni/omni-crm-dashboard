@@ -422,6 +422,9 @@ function aggregateRevenueByMonth(data) {
 }
 
 // ─── STATE ───
+// Keys that hold imported dashboard data and should persist in Neon
+const DATA_KEYS = ['emailFlows','loyalty','segments','outreach','beforeAfter','holdoutTests','activityROI','revenue','subscriptions','milestoneProducts','whatsappFlows','postcardFlows','channelCosts','productChurn'];
+
 const initialState = {
   activeTab: 'overview',
   emailFlows: DEMO_EMAIL_FLOWS,
@@ -1747,6 +1750,31 @@ async function initNeonTables(connectionString) {
     username TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
   )`;
+  await sql`CREATE TABLE IF NOT EXISTS dashboard_data (
+    id SERIAL PRIMARY KEY,
+    data_key TEXT UNIQUE NOT NULL,
+    data_value JSONB NOT NULL DEFAULT '[]',
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+  )`;
+}
+
+// ─── NEON DATA PERSISTENCE ───
+async function saveDashboardData(connStr, dataKey, dataValue) {
+  if (!connStr) return;
+  try {
+    await neonQuery(connStr, 'INSERT INTO dashboard_data (data_key, data_value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (data_key) DO UPDATE SET data_value = $2, updated_at = NOW()', [dataKey, JSON.stringify(dataValue)]);
+  } catch (e) { console.warn('Failed to save dashboard data to Neon:', e); }
+}
+
+async function loadAllDashboardData(connStr) {
+  if (!connStr) return null;
+  try {
+    const rows = await neonQuery(connStr, 'SELECT data_key, data_value FROM dashboard_data', []);
+    if (!rows || rows.length === 0) return null;
+    const result = {};
+    rows.forEach(r => { result[r.data_key] = r.data_value; });
+    return result;
+  } catch (e) { console.warn('Failed to load dashboard data from Neon:', e); return null; }
 }
 
 // ─── ACTIVITY LOG COLORS ───
@@ -5006,6 +5034,42 @@ export default function App() {
       } catch (_) {}
     }
   }, []);
+
+  // ── Load dashboard data from Neon on mount, then persist changes ──
+  const neonInitDone = useRef(false);
+  const skipPersist = useRef(true); // skip first persist cycle (initial load)
+  useEffect(() => {
+    const conn = getNeonConnection();
+    if (!conn || neonInitDone.current) return;
+    neonInitDone.current = true;
+    loadAllDashboardData(conn).then(data => {
+      if (data) {
+        DATA_KEYS.forEach(key => {
+          if (data[key] && Array.isArray(data[key]) && data[key].length > 0) {
+            dispatch({ type: 'LOAD_DATA', source: key, payload: data[key] });
+          }
+        });
+      }
+      // Allow persisting after initial load completes
+      setTimeout(() => { skipPersist.current = false; }, 500);
+    }).catch(() => { skipPersist.current = false; });
+  }, []);
+
+  // ── Persist dashboard data to Neon when it changes ──
+  const prevDataRef = useRef({});
+  useEffect(() => {
+    if (skipPersist.current) return;
+    const conn = getNeonConnection();
+    if (!conn) return;
+    DATA_KEYS.forEach(key => {
+      if (state[key] !== prevDataRef.current[key] && state[key] !== undefined) {
+        saveDashboardData(conn, key, state[key]);
+      }
+    });
+    const refs = {};
+    DATA_KEYS.forEach(key => { refs[key] = state[key]; });
+    prevDataRef.current = refs;
+  }, [state.emailFlows, state.loyalty, state.segments, state.outreach, state.beforeAfter, state.holdoutTests, state.activityROI, state.revenue, state.subscriptions, state.milestoneProducts, state.whatsappFlows, state.postcardFlows, state.channelCosts, state.productChurn]);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('crm_user_id');
