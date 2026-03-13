@@ -1370,8 +1370,38 @@ function AIDataImporter({ dispatch, onOpenSettings, onLogImport, dashboardState 
 
   const clearImage = () => { setImageData(null); setImagePreviewUrl(null); if (imageRef.current) imageRef.current.value = ''; };
 
-  const dateContext = (importDateStart || importDateEnd) ? `\n\nDate context provided by user: ${importDateStart ? `Start: ${importDateStart}` : ''}${importDateStart && importDateEnd ? ', ' : ''}${importDateEnd ? `End: ${importDateEnd}` : ''}. If the data does not include explicit dates, use this date range to generate appropriate weekly (YYYY-MM-DD Mondays) or monthly (YYYY-MM) date values spanning this range.` : '';
-  const systemPrompt = `You are a data formatting assistant. Convert the user's raw data into a JSON object with two keys: "summary" and "data".\n\nFields: ${schema.fields.join(', ')}\n\nExample rows:\n${JSON.stringify(schema.example, null, 2)}${dateContext}\n\nRules:\n- Return ONLY a valid JSON object with exactly two keys: "summary" (string) and "data" (array)\n- No markdown, no explanation, no code fences — just the raw JSON object\n- "data" must be an array of objects matching the schema above\n- "summary" must be a brief human-readable description (2-4 sentences) of what you found: number of rows, date range if applicable, key totals (e.g. total revenue, total sends), and any data quality notes (missing fields, assumptions made)\n- Use the exact field names shown\n- Convert dates to the format shown in examples\n- Numeric fields should be numbers, not strings\n- If data is missing a field, use null\n- Ensure all rows have all fields`;
+  const dateContext = (importDateStart || importDateEnd) ? `\n\nDate context provided by user: ${importDateStart ? `Start: ${importDateStart}` : ''}${importDateStart && importDateEnd ? ', ' : ''}${importDateEnd ? `End: ${importDateEnd}` : ''}. Use this date range to assign appropriate weekly (YYYY-MM-DD, always a Monday) or monthly (YYYY-MM) date values. If the source data covers multiple weeks within this range, create separate rows for each week.` : '';
+
+  const dataModelHints = {
+    emailFlows: `\n\nDATA MODEL — CRITICAL:\n- Each row = ONE campaign or flow for ONE week\n- "type" MUST be either "Campaign" or "Flow" — classify based on the name (automated sequences like Welcome, Abandoned Cart, Win-Back, Post-Purchase, Re-Engagement = "Flow"; scheduled sends/broadcasts = "Campaign")\n- "week" = the Monday date (YYYY-MM-DD) of that week\n- "flowName" = the exact campaign/flow name from the source data\n- If a screenshot shows a list of campaigns with their metrics, each row in the screenshot = one row in your output\n- Revenue, sends, opens, clicks etc. are the RAW values per campaign per week — do NOT aggregate or sum them\n- openRate, ctr, unsubRate should be decimals (e.g. 0.65 for 65%, 0.012 for 1.2%)\n- The dashboard sums these rows to compute totals, so keep individual rows separate\n- If the source shows aggregated/grouped campaigns, split them into individual rows where possible`,
+    revenue: `\n\nDATA MODEL:\n- Each row = one week of total business revenue\n- "week" = Monday date (YYYY-MM-DD)\n- Revenue values are in GBP, use raw numbers (no currency symbols)\n- If source shows daily data, aggregate into weekly rows (Mon-Sun)`,
+    loyalty: `\n\nDATA MODEL:\n- Each row = one month of milestone/loyalty program data\n- "month" = YYYY-MM format`,
+    segments: `\n\nDATA MODEL:\n- Each row = one month of customer segment data\n- "month" = YYYY-MM format`,
+    subscriptions: `\n\nDATA MODEL:\n- Each row = one month of subscription metrics\n- "month" = YYYY-MM format\n- churnRate should be a decimal (e.g. 0.05 for 5%)`,
+  };
+
+  const modelHint = dataModelHints[selectedDataset] || '';
+  const systemPrompt = `You are a data extraction and formatting assistant for a CRM dashboard. Your job is to carefully read the user's raw data (text, CSV, or screenshot) and convert it into structured JSON.
+
+Return a JSON object with exactly two keys: "summary" (string) and "data" (array).
+
+Target schema fields: ${schema.fields.join(', ')}
+
+Example rows showing the exact format expected:
+${JSON.stringify(schema.example, null, 2)}${modelHint}${dateContext}
+
+RULES:
+- Return ONLY a valid JSON object — no markdown, no code fences, no explanation
+- "data" must be an array of objects matching the schema fields above
+- "summary" must be a brief description (2-4 sentences): row count, date range, key totals, and any data quality notes
+- CRITICAL: Create one row per item per time period. Do NOT merge or aggregate multiple items into a single row
+- CRITICAL: Read EVERY row from the source data. Do not skip or truncate rows
+- CRITICAL: Extract the actual numeric values shown in the source. Do not invent or estimate values
+- Use the exact field names shown in the schema
+- Numeric fields must be numbers, not strings. Percentages as decimals (65% → 0.65)
+- Parse number formats: "£1,234.56" → 1234.56, "14.5K" → 14500, "1.2M" → 1200000
+- If a field is not available in the source, use null
+- Ensure every row has all fields from the schema`;
 
   const organizeWithAI = async () => {
     if (!apiKey) { setError('No API key configured. Please open Settings.'); return; }
@@ -1391,7 +1421,7 @@ function AIDataImporter({ dispatch, onOpenSettings, onLogImport, dashboardState 
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4096, system: systemPrompt, messages }),
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 8192, system: systemPrompt, messages }),
       });
       if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error?.message || `API error ${resp.status}`); }
       const data = await resp.json();
