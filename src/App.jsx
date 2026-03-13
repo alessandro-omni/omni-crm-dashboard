@@ -128,350 +128,22 @@ const OmniPetLogo = ({ height = 28 }) => (
   </svg>
 );
 
-// ─── DEMO DATA ───
-const DEMO_REVENUE = [
-  { week: "2025-01-06", totalRevenue: 142500, subscriptionRevenue: 98200, oneTimeRevenue: 44300, refunds: 3200, netRevenue: 139300, totalOrders: 1850, aov: 77.03 },
-  { week: "2025-01-13", totalRevenue: 148900, subscriptionRevenue: 103400, oneTimeRevenue: 45500, refunds: 2800, netRevenue: 146100, totalOrders: 1920, aov: 77.55 },
-  { week: "2025-01-20", totalRevenue: 151200, subscriptionRevenue: 106800, oneTimeRevenue: 44400, refunds: 3500, netRevenue: 147700, totalOrders: 1960, aov: 77.14 },
-  { week: "2025-01-27", totalRevenue: 155800, subscriptionRevenue: 110200, oneTimeRevenue: 45600, refunds: 2900, netRevenue: 152900, totalOrders: 2010, aov: 77.51 },
-  { week: "2025-02-03", totalRevenue: 158400, subscriptionRevenue: 113500, oneTimeRevenue: 44900, refunds: 3100, netRevenue: 155300, totalOrders: 2040, aov: 77.65 },
-  { week: "2025-02-10", totalRevenue: 162100, subscriptionRevenue: 116800, oneTimeRevenue: 45300, refunds: 2700, netRevenue: 159400, totalOrders: 2080, aov: 77.93 },
-  { week: "2025-02-17", totalRevenue: 159800, subscriptionRevenue: 114200, oneTimeRevenue: 45600, refunds: 3400, netRevenue: 156400, totalOrders: 2050, aov: 77.95 },
-  { week: "2025-02-24", totalRevenue: 165300, subscriptionRevenue: 119100, oneTimeRevenue: 46200, refunds: 2600, netRevenue: 162700, totalOrders: 2120, aov: 77.97 },
-  { week: "2025-03-03", totalRevenue: 168900, subscriptionRevenue: 122400, oneTimeRevenue: 46500, refunds: 3000, netRevenue: 165900, totalOrders: 2170, aov: 77.83 },
-  { week: "2025-03-10", totalRevenue: 172500, subscriptionRevenue: 125800, oneTimeRevenue: 46700, refunds: 2500, netRevenue: 170000, totalOrders: 2210, aov: 78.05 },
-  { week: "2025-03-17", totalRevenue: 170100, subscriptionRevenue: 123600, oneTimeRevenue: 46500, refunds: 3300, netRevenue: 166800, totalOrders: 2180, aov: 78.03 },
-  { week: "2025-03-24", totalRevenue: 175200, subscriptionRevenue: 128400, oneTimeRevenue: 46800, refunds: 2800, netRevenue: 172400, totalOrders: 2250, aov: 77.87 },
-];
+// ─── DATA DEFAULTS (empty — import your own via AI Importer or CSV) ───
+const DEMO_REVENUE = [];
+const DEMO_SUBSCRIPTIONS = [];
+const DEMO_EMAIL_FLOWS = [];
+const DEMO_LOYALTY = [];
+const DEMO_MILESTONE_PRODUCTS = [];
+const DEMO_SEGMENTS = [];
+const DEMO_OUTREACH = [];
+const DEMO_WHATSAPP_FLOWS = [];
+const DEMO_POSTCARD_FLOWS = [];
+const DEMO_CHANNEL_COSTS = [];
+const DEMO_PRODUCT_CHURN = [];
+const DEMO_BEFORE_AFTER = [];
+const DEMO_HOLDOUT_TESTS = [];
+const DEMO_ACTIVITY_ROI = [];
 
-const DEMO_SUBSCRIPTIONS = [
-  { month: "2024-10", activeSubscribers: 4120, newSubscribers: 580, churnedSubscribers: 310, reactivated: 45, mrr: 89200, churnRate: 7.5, voluntaryChurn: 5.2, involuntaryChurn: 2.3, ltv: 245, skipCount: 180 },
-  { month: "2024-11", activeSubscribers: 4435, newSubscribers: 620, churnedSubscribers: 350, reactivated: 55, mrr: 96400, churnRate: 7.9, voluntaryChurn: 5.5, involuntaryChurn: 2.4, ltv: 252, skipCount: 195 },
-  { month: "2024-12", activeSubscribers: 4780, newSubscribers: 710, churnedSubscribers: 420, reactivated: 65, mrr: 104800, churnRate: 8.8, voluntaryChurn: 6.1, involuntaryChurn: 2.7, ltv: 248, skipCount: 230 },
-  { month: "2025-01", activeSubscribers: 5050, newSubscribers: 640, churnedSubscribers: 420, reactivated: 50, mrr: 110200, churnRate: 8.3, voluntaryChurn: 5.8, involuntaryChurn: 2.5, ltv: 258, skipCount: 210 },
-  { month: "2025-02", activeSubscribers: 5280, newSubscribers: 590, churnedSubscribers: 400, reactivated: 40, mrr: 116800, churnRate: 7.6, voluntaryChurn: 5.3, involuntaryChurn: 2.3, ltv: 265, skipCount: 195 },
-  { month: "2025-03", activeSubscribers: 5520, newSubscribers: 620, churnedSubscribers: 420, reactivated: 40, mrr: 125800, churnRate: 7.6, voluntaryChurn: 5.1, involuntaryChurn: 2.5, ltv: 272, skipCount: 205 },
-];
-
-const DEMO_EMAIL_FLOWS = [
-  { week: "2025-01-06", type: "Campaign", flowName: null, sends: 42000, delivered: 40320, opens: 16530, openRate: 41.0, clicks: 2260, ctr: 5.61, unsubscribes: 84, unsubRate: 0.21, revenue: 7600, conversions: 195, listSize: 48500 },
-  { week: "2025-01-06", type: "Flow", flowName: "Welcome Series", sends: 980, delivered: 960, opens: 576, openRate: 60.0, clicks: 211, ctr: 21.98, unsubscribes: 5, unsubRate: 0.52, revenue: 4200, conversions: 68 },
-  { week: "2025-01-06", type: "Flow", flowName: "Abandoned Cart", sends: 2800, delivered: 2716, opens: 1358, openRate: 50.0, clicks: 435, ctr: 16.01, unsubscribes: 8, unsubRate: 0.29, revenue: 10200, conversions: 142 },
-  { week: "2025-01-06", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1600, delivered: 1568, opens: 830, openRate: 52.9, clicks: 267, ctr: 17.03, unsubscribes: 3, unsubRate: 0.19, revenue: 1850, conversions: 45 },
-  { week: "2025-01-06", type: "Flow", flowName: "Win-Back 60d", sends: 2400, delivered: 2304, opens: 691, openRate: 30.0, clicks: 138, ctr: 5.99, unsubscribes: 24, unsubRate: 1.04, revenue: 2800, conversions: 38 },
-  { week: "2025-01-13", type: "Campaign", flowName: null, sends: 43000, delivered: 41280, opens: 17334, openRate: 42.0, clicks: 2395, ctr: 5.80, unsubscribes: 78, unsubRate: 0.19, revenue: 8100, conversions: 210, listSize: 49200 },
-  { week: "2025-01-13", type: "Flow", flowName: "Welcome Series", sends: 1050, delivered: 1029, opens: 617, openRate: 59.9, clicks: 226, ctr: 21.96, unsubscribes: 4, unsubRate: 0.39, revenue: 4500, conversions: 72 },
-  { week: "2025-01-13", type: "Flow", flowName: "Abandoned Cart", sends: 2900, delivered: 2813, opens: 1407, openRate: 50.0, clicks: 450, ctr: 16.00, unsubscribes: 9, unsubRate: 0.32, revenue: 10800, conversions: 148 },
-  { week: "2025-01-13", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1650, delivered: 1617, opens: 873, openRate: 54.0, clicks: 283, ctr: 17.50, unsubscribes: 3, unsubRate: 0.19, revenue: 1950, conversions: 48 },
-  { week: "2025-01-13", type: "Flow", flowName: "Win-Back 60d", sends: 2350, delivered: 2256, opens: 677, openRate: 30.0, clicks: 135, ctr: 5.98, unsubscribes: 22, unsubRate: 0.98, revenue: 2650, conversions: 36 },
-  { week: "2025-01-20", type: "Campaign", flowName: null, sends: 43500, delivered: 41760, opens: 17546, openRate: 42.0, clicks: 2464, ctr: 5.90, unsubscribes: 72, unsubRate: 0.17, revenue: 8400, conversions: 218, listSize: 49800 },
-  { week: "2025-01-20", type: "Flow", flowName: "Welcome Series", sends: 1100, delivered: 1078, opens: 647, openRate: 60.0, clicks: 237, ctr: 21.98, unsubscribes: 5, unsubRate: 0.46, revenue: 4800, conversions: 76 },
-  { week: "2025-01-20", type: "Flow", flowName: "Abandoned Cart", sends: 3000, delivered: 2910, opens: 1455, openRate: 50.0, clicks: 466, ctr: 16.01, unsubscribes: 10, unsubRate: 0.34, revenue: 11200, conversions: 152 },
-  { week: "2025-01-20", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1700, delivered: 1666, opens: 900, openRate: 54.0, clicks: 292, ctr: 17.53, unsubscribes: 3, unsubRate: 0.18, revenue: 2050, conversions: 50 },
-  { week: "2025-01-20", type: "Flow", flowName: "Win-Back 60d", sends: 2300, delivered: 2208, opens: 663, openRate: 30.0, clicks: 132, ctr: 5.98, unsubscribes: 21, unsubRate: 0.95, revenue: 2500, conversions: 34 },
-  { week: "2025-01-27", type: "Campaign", flowName: null, sends: 44000, delivered: 42240, opens: 17742, openRate: 42.0, clicks: 2535, ctr: 6.00, unsubscribes: 70, unsubRate: 0.17, revenue: 8800, conversions: 225, listSize: 50300 },
-  { week: "2025-01-27", type: "Flow", flowName: "Welcome Series", sends: 1150, delivered: 1127, opens: 676, openRate: 60.0, clicks: 248, ctr: 22.0, unsubscribes: 5, unsubRate: 0.44, revenue: 5100, conversions: 80 },
-  { week: "2025-01-27", type: "Flow", flowName: "Abandoned Cart", sends: 3100, delivered: 3007, opens: 1504, openRate: 50.0, clicks: 481, ctr: 15.99, unsubscribes: 11, unsubRate: 0.37, revenue: 11600, conversions: 158 },
-  { week: "2025-01-27", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1750, delivered: 1715, opens: 926, openRate: 54.0, clicks: 300, ctr: 17.49, unsubscribes: 3, unsubRate: 0.17, revenue: 2150, conversions: 52 },
-  { week: "2025-01-27", type: "Flow", flowName: "Win-Back 60d", sends: 2250, delivered: 2160, opens: 648, openRate: 30.0, clicks: 130, ctr: 6.02, unsubscribes: 20, unsubRate: 0.93, revenue: 2400, conversions: 32 },
-  { week: "2025-02-03", type: "Campaign", flowName: null, sends: 44500, delivered: 42720, opens: 18342, openRate: 42.9, clicks: 2606, ctr: 6.10, unsubscribes: 68, unsubRate: 0.16, revenue: 9200, conversions: 235, listSize: 50800 },
-  { week: "2025-02-03", type: "Flow", flowName: "Welcome Series", sends: 1200, delivered: 1176, opens: 706, openRate: 60.0, clicks: 259, ctr: 22.02, unsubscribes: 5, unsubRate: 0.43, revenue: 5400, conversions: 84 },
-  { week: "2025-02-03", type: "Flow", flowName: "Abandoned Cart", sends: 3200, delivered: 3104, opens: 1552, openRate: 50.0, clicks: 497, ctr: 16.01, unsubscribes: 10, unsubRate: 0.32, revenue: 12000, conversions: 165 },
-  { week: "2025-02-03", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1800, delivered: 1764, opens: 953, openRate: 54.0, clicks: 309, ctr: 17.52, unsubscribes: 3, unsubRate: 0.17, revenue: 2200, conversions: 54 },
-  { week: "2025-02-03", type: "Flow", flowName: "Win-Back 60d", sends: 2200, delivered: 2112, opens: 634, openRate: 30.0, clicks: 127, ctr: 6.01, unsubscribes: 19, unsubRate: 0.90, revenue: 2300, conversions: 31 },
-  { week: "2025-02-10", type: "Campaign", flowName: null, sends: 45000, delivered: 43200, opens: 18792, openRate: 43.5, clicks: 2678, ctr: 6.20, unsubscribes: 65, unsubRate: 0.15, revenue: 9500, conversions: 242, listSize: 51200 },
-  { week: "2025-02-10", type: "Flow", flowName: "Welcome Series", sends: 1250, delivered: 1225, opens: 735, openRate: 60.0, clicks: 269, ctr: 21.96, unsubscribes: 5, unsubRate: 0.41, revenue: 5600, conversions: 88 },
-  { week: "2025-02-10", type: "Flow", flowName: "Abandoned Cart", sends: 3300, delivered: 3201, opens: 1601, openRate: 50.0, clicks: 512, ctr: 15.99, unsubscribes: 10, unsubRate: 0.31, revenue: 12500, conversions: 170 },
-  { week: "2025-02-10", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1850, delivered: 1813, opens: 979, openRate: 54.0, clicks: 317, ctr: 17.49, unsubscribes: 3, unsubRate: 0.17, revenue: 2300, conversions: 56 },
-  { week: "2025-02-10", type: "Flow", flowName: "Win-Back 60d", sends: 2150, delivered: 2064, opens: 640, openRate: 31.0, clicks: 134, ctr: 6.49, unsubscribes: 18, unsubRate: 0.87, revenue: 2600, conversions: 35 },
-  { week: "2025-02-17", type: "Campaign", flowName: null, sends: 45200, delivered: 43392, opens: 18636, openRate: 42.9, clicks: 2647, ctr: 6.10, unsubscribes: 67, unsubRate: 0.15, revenue: 9300, conversions: 238, listSize: 51500 },
-  { week: "2025-02-17", type: "Flow", flowName: "Welcome Series", sends: 1180, delivered: 1156, opens: 694, openRate: 60.0, clicks: 254, ctr: 21.97, unsubscribes: 5, unsubRate: 0.43, revenue: 5300, conversions: 83 },
-  { week: "2025-02-17", type: "Flow", flowName: "Abandoned Cart", sends: 3250, delivered: 3153, opens: 1576, openRate: 50.0, clicks: 504, ctr: 15.98, unsubscribes: 10, unsubRate: 0.32, revenue: 12200, conversions: 168 },
-  { week: "2025-02-17", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1820, delivered: 1784, opens: 963, openRate: 54.0, clicks: 312, ctr: 17.49, unsubscribes: 3, unsubRate: 0.17, revenue: 2250, conversions: 55 },
-  { week: "2025-02-17", type: "Flow", flowName: "Win-Back 60d", sends: 2100, delivered: 2016, opens: 645, openRate: 32.0, clicks: 141, ctr: 6.99, unsubscribes: 17, unsubRate: 0.84, revenue: 2800, conversions: 38 },
-  { week: "2025-02-24", type: "Campaign", flowName: null, sends: 45500, delivered: 43680, opens: 19003, openRate: 43.5, clicks: 2737, ctr: 6.26, unsubscribes: 63, unsubRate: 0.14, revenue: 9800, conversions: 250, listSize: 51800 },
-  { week: "2025-02-24", type: "Flow", flowName: "Welcome Series", sends: 1300, delivered: 1274, opens: 764, openRate: 60.0, clicks: 280, ctr: 21.98, unsubscribes: 5, unsubRate: 0.39, revenue: 5800, conversions: 91 },
-  { week: "2025-02-24", type: "Flow", flowName: "Abandoned Cart", sends: 3350, delivered: 3250, opens: 1625, openRate: 50.0, clicks: 520, ctr: 16.0, unsubscribes: 11, unsubRate: 0.34, revenue: 13000, conversions: 175 },
-  { week: "2025-02-24", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1880, delivered: 1842, opens: 995, openRate: 54.0, clicks: 322, ctr: 17.48, unsubscribes: 3, unsubRate: 0.16, revenue: 2350, conversions: 57 },
-  { week: "2025-02-24", type: "Flow", flowName: "Win-Back 60d", sends: 2050, delivered: 1968, opens: 630, openRate: 32.0, clicks: 138, ctr: 7.01, unsubscribes: 16, unsubRate: 0.81, revenue: 2900, conversions: 40 },
-  { week: "2025-03-03", type: "Campaign", flowName: null, sends: 46000, delivered: 44160, opens: 19218, openRate: 43.5, clicks: 2782, ctr: 6.30, unsubscribes: 60, unsubRate: 0.14, revenue: 10200, conversions: 260, listSize: 52200 },
-  { week: "2025-03-03", type: "Flow", flowName: "Welcome Series", sends: 1350, delivered: 1323, opens: 794, openRate: 60.0, clicks: 291, ctr: 22.0, unsubscribes: 5, unsubRate: 0.38, revenue: 6000, conversions: 94 },
-  { week: "2025-03-03", type: "Flow", flowName: "Abandoned Cart", sends: 3400, delivered: 3298, opens: 1649, openRate: 50.0, clicks: 528, ctr: 16.01, unsubscribes: 10, unsubRate: 0.30, revenue: 13400, conversions: 180 },
-  { week: "2025-03-03", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1900, delivered: 1862, opens: 1006, openRate: 54.0, clicks: 326, ctr: 17.51, unsubscribes: 3, unsubRate: 0.16, revenue: 2400, conversions: 58 },
-  { week: "2025-03-03", type: "Flow", flowName: "Win-Back 60d", sends: 2000, delivered: 1920, opens: 634, openRate: 33.0, clicks: 144, ctr: 7.50, unsubscribes: 15, unsubRate: 0.78, revenue: 3100, conversions: 42 },
-  { week: "2025-03-03", type: "Flow", flowName: "Re-Engagement 90d", sends: 1800, delivered: 1728, opens: 449, openRate: 26.0, clicks: 69, ctr: 3.99, unsubscribes: 36, unsubRate: 2.08, revenue: 800, conversions: 12 },
-  { week: "2025-03-10", type: "Campaign", flowName: null, sends: 46500, delivered: 44640, opens: 19436, openRate: 43.5, clicks: 2812, ctr: 6.30, unsubscribes: 58, unsubRate: 0.13, revenue: 10500, conversions: 268, listSize: 52600 },
-  { week: "2025-03-10", type: "Flow", flowName: "Welcome Series", sends: 1400, delivered: 1372, opens: 823, openRate: 60.0, clicks: 302, ctr: 22.01, unsubscribes: 5, unsubRate: 0.36, revenue: 6200, conversions: 97 },
-  { week: "2025-03-10", type: "Flow", flowName: "Abandoned Cart", sends: 3500, delivered: 3395, opens: 1698, openRate: 50.0, clicks: 543, ctr: 15.99, unsubscribes: 10, unsubRate: 0.29, revenue: 13800, conversions: 186 },
-  { week: "2025-03-10", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1950, delivered: 1911, opens: 1032, openRate: 54.0, clicks: 334, ctr: 17.48, unsubscribes: 3, unsubRate: 0.16, revenue: 2500, conversions: 60 },
-  { week: "2025-03-10", type: "Flow", flowName: "Win-Back 60d", sends: 1950, delivered: 1872, opens: 618, openRate: 33.0, clicks: 140, ctr: 7.48, unsubscribes: 14, unsubRate: 0.75, revenue: 3200, conversions: 44 },
-  { week: "2025-03-10", type: "Flow", flowName: "Re-Engagement 90d", sends: 1750, delivered: 1680, opens: 470, openRate: 28.0, clicks: 84, ctr: 5.0, unsubscribes: 32, unsubRate: 1.90, revenue: 1100, conversions: 16 },
-  { week: "2025-03-17", type: "Campaign", flowName: null, sends: 46800, delivered: 44928, opens: 19571, openRate: 43.6, clicks: 2830, ctr: 6.30, unsubscribes: 56, unsubRate: 0.12, revenue: 10800, conversions: 275, listSize: 53000 },
-  { week: "2025-03-17", type: "Flow", flowName: "Welcome Series", sends: 1420, delivered: 1392, opens: 835, openRate: 60.0, clicks: 306, ctr: 21.98, unsubscribes: 5, unsubRate: 0.36, revenue: 6400, conversions: 100 },
-  { week: "2025-03-17", type: "Flow", flowName: "Abandoned Cart", sends: 3550, delivered: 3444, opens: 1722, openRate: 50.0, clicks: 551, ctr: 16.0, unsubscribes: 10, unsubRate: 0.29, revenue: 14000, conversions: 190 },
-  { week: "2025-03-17", type: "Flow", flowName: "Post-Purchase Upsell", sends: 1980, delivered: 1940, opens: 1048, openRate: 54.0, clicks: 339, ctr: 17.47, unsubscribes: 3, unsubRate: 0.15, revenue: 2550, conversions: 62 },
-  { week: "2025-03-17", type: "Flow", flowName: "Win-Back 60d", sends: 1900, delivered: 1824, opens: 602, openRate: 33.0, clicks: 137, ctr: 7.51, unsubscribes: 13, unsubRate: 0.71, revenue: 3300, conversions: 45 },
-  { week: "2025-03-17", type: "Flow", flowName: "Re-Engagement 90d", sends: 1700, delivered: 1632, opens: 490, openRate: 30.0, clicks: 98, ctr: 6.0, unsubscribes: 28, unsubRate: 1.72, revenue: 1400, conversions: 20 },
-  { week: "2025-03-24", type: "Campaign", flowName: null, sends: 47000, delivered: 45120, opens: 19853, openRate: 44.0, clicks: 2888, ctr: 6.40, unsubscribes: 52, unsubRate: 0.12, revenue: 11200, conversions: 285, listSize: 53400 },
-  { week: "2025-03-24", type: "Flow", flowName: "Welcome Series", sends: 1450, delivered: 1421, opens: 853, openRate: 60.0, clicks: 313, ctr: 22.03, unsubscribes: 5, unsubRate: 0.35, revenue: 6600, conversions: 103 },
-  { week: "2025-03-24", type: "Flow", flowName: "Abandoned Cart", sends: 3600, delivered: 3492, opens: 1746, openRate: 50.0, clicks: 559, ctr: 16.01, unsubscribes: 10, unsubRate: 0.29, revenue: 14200, conversions: 192 },
-  { week: "2025-03-24", type: "Flow", flowName: "Post-Purchase Upsell", sends: 2000, delivered: 1960, opens: 1058, openRate: 54.0, clicks: 343, ctr: 17.50, unsubscribes: 3, unsubRate: 0.15, revenue: 2600, conversions: 63 },
-  { week: "2025-03-24", type: "Flow", flowName: "Win-Back 60d", sends: 1850, delivered: 1776, opens: 604, openRate: 34.0, clicks: 142, ctr: 7.99, unsubscribes: 12, unsubRate: 0.68, revenue: 3500, conversions: 48 },
-  { week: "2025-03-24", type: "Flow", flowName: "Re-Engagement 90d", sends: 1650, delivered: 1584, opens: 507, openRate: 32.0, clicks: 111, ctr: 7.01, unsubscribes: 25, unsubRate: 1.58, revenue: 1700, conversions: 24 },
-];
-
-const DEMO_LOYALTY = [
-  { month: "2024-10", totalMembers: 820, newEnrollments: 820, pointsIssued: 164000, pointsRedeemed: 8200, redemptionRate: 5.0, rewardsRedeemed: 41, rewardCostGBP: 1230, revenueFromMembers: 28500, revenueFromNonMembers: 114000, memberAOV: 82.50, nonMemberAOV: 74.20, memberRetentionRate: 88.0, nonMemberRetentionRate: 78.0, tier2ndOrderMembers: 620, tier2ndOrderAOV: 78.40, tier2ndOrderLTV: 156.80, tier3rdOrderMembers: 160, tier3rdOrderAOV: 84.20, tier3rdOrderLTV: 252.60, tier6thOrderMembers: 40, tier6thOrderAOV: 96.50, tier6thOrderLTV: 579.00, nonMemberLTV: 112.40 },
-  { month: "2024-11", totalMembers: 1380, newEnrollments: 560, pointsIssued: 276000, pointsRedeemed: 27600, redemptionRate: 10.0, rewardsRedeemed: 92, rewardCostGBP: 2760, revenueFromMembers: 52200, revenueFromNonMembers: 100200, memberAOV: 84.00, nonMemberAOV: 73.80, memberRetentionRate: 89.5, nonMemberRetentionRate: 76.0, tier2ndOrderMembers: 980, tier2ndOrderAOV: 79.80, tier2ndOrderLTV: 159.60, tier3rdOrderMembers: 300, tier3rdOrderAOV: 86.50, tier3rdOrderLTV: 259.50, tier6thOrderMembers: 100, tier6thOrderAOV: 98.20, tier6thOrderLTV: 589.20, nonMemberLTV: 113.20 },
-  { month: "2024-12", totalMembers: 1950, newEnrollments: 570, pointsIssued: 390000, pointsRedeemed: 54600, redemptionRate: 14.0, rewardsRedeemed: 182, rewardCostGBP: 5460, revenueFromMembers: 78400, revenueFromNonMembers: 82400, memberAOV: 85.50, nonMemberAOV: 73.50, memberRetentionRate: 90.2, nonMemberRetentionRate: 72.0, tier2ndOrderMembers: 1320, tier2ndOrderAOV: 81.20, tier2ndOrderLTV: 162.40, tier3rdOrderMembers: 450, tier3rdOrderAOV: 88.80, tier3rdOrderLTV: 266.40, tier6thOrderMembers: 180, tier6thOrderAOV: 100.50, tier6thOrderLTV: 603.00, nonMemberLTV: 113.80 },
-  { month: "2025-01", totalMembers: 2540, newEnrollments: 590, pointsIssued: 508000, pointsRedeemed: 81280, redemptionRate: 16.0, rewardsRedeemed: 254, rewardCostGBP: 7620, revenueFromMembers: 105600, revenueFromNonMembers: 72400, memberAOV: 86.80, nonMemberAOV: 73.20, memberRetentionRate: 91.0, nonMemberRetentionRate: 71.0, tier2ndOrderMembers: 1680, tier2ndOrderAOV: 82.60, tier2ndOrderLTV: 165.20, tier3rdOrderMembers: 600, tier3rdOrderAOV: 90.40, tier3rdOrderLTV: 271.20, tier6thOrderMembers: 260, tier6thOrderAOV: 102.80, tier6thOrderLTV: 616.80, nonMemberLTV: 114.50 },
-  { month: "2025-02", totalMembers: 3100, newEnrollments: 560, pointsIssued: 620000, pointsRedeemed: 111600, redemptionRate: 18.0, rewardsRedeemed: 341, rewardCostGBP: 10230, revenueFromMembers: 134200, revenueFromNonMembers: 58800, memberAOV: 88.20, nonMemberAOV: 72.80, memberRetentionRate: 91.8, nonMemberRetentionRate: 70.5, tier2ndOrderMembers: 2020, tier2ndOrderAOV: 83.80, tier2ndOrderLTV: 167.60, tier3rdOrderMembers: 740, tier3rdOrderAOV: 92.10, tier3rdOrderLTV: 276.30, tier6thOrderMembers: 340, tier6thOrderAOV: 105.20, tier6thOrderLTV: 631.20, nonMemberLTV: 115.20 },
-  { month: "2025-03", totalMembers: 3680, newEnrollments: 580, pointsIssued: 736000, pointsRedeemed: 147200, redemptionRate: 20.0, rewardsRedeemed: 442, rewardCostGBP: 13260, revenueFromMembers: 162400, revenueFromNonMembers: 48200, memberAOV: 89.50, nonMemberAOV: 72.50, memberRetentionRate: 92.4, nonMemberRetentionRate: 69.8, tier2ndOrderMembers: 2400, tier2ndOrderAOV: 85.20, tier2ndOrderLTV: 170.40, tier3rdOrderMembers: 880, tier3rdOrderAOV: 93.80, tier3rdOrderLTV: 281.40, tier6thOrderMembers: 400, tier6thOrderAOV: 108.60, tier6thOrderLTV: 651.60, nonMemberLTV: 116.00 },
-];
-
-const DEMO_MILESTONE_PRODUCTS = [
-  // Stress & Anxiety — supplement, high LTV
-  { month: "2024-10", product: "Stress & Anxiety", tier2nd: 130, tier2ndAOV: 78.20, tier2ndLTV: 156.40, tier3rd: 32, tier3rdAOV: 86.40, tier3rdLTV: 259.20, tier6th: 8, tier6thAOV: 98.50, tier6thLTV: 591.00 },
-  { month: "2024-11", product: "Stress & Anxiety", tier2nd: 205, tier2ndAOV: 79.60, tier2ndLTV: 159.20, tier3rd: 60, tier3rdAOV: 88.80, tier3rdLTV: 266.40, tier6th: 20, tier6thAOV: 100.20, tier6thLTV: 601.20 },
-  { month: "2024-12", product: "Stress & Anxiety", tier2nd: 275, tier2ndAOV: 81.00, tier2ndLTV: 162.00, tier3rd: 90, tier3rdAOV: 91.20, tier3rdLTV: 273.60, tier6th: 36, tier6thAOV: 102.80, tier6thLTV: 616.80 },
-  { month: "2025-01", product: "Stress & Anxiety", tier2nd: 350, tier2ndAOV: 82.40, tier2ndLTV: 164.80, tier3rd: 120, tier3rdAOV: 92.60, tier3rdLTV: 277.80, tier6th: 52, tier6thAOV: 105.40, tier6thLTV: 632.40 },
-  { month: "2025-02", product: "Stress & Anxiety", tier2nd: 420, tier2ndAOV: 83.80, tier2ndLTV: 167.60, tier3rd: 148, tier3rdAOV: 94.00, tier3rdLTV: 282.00, tier6th: 68, tier6thAOV: 107.80, tier6thLTV: 646.80 },
-  { month: "2025-03", product: "Stress & Anxiety", tier2nd: 500, tier2ndAOV: 85.20, tier2ndLTV: 170.40, tier3rd: 180, tier3rdAOV: 95.80, tier3rdLTV: 287.40, tier6th: 82, tier6thAOV: 110.20, tier6thLTV: 661.20 },
-  // Adult Dry Food — staple, high volume, moderate LTV
-  { month: "2024-10", product: "Adult Dry Food", tier2nd: 210, tier2ndAOV: 74.50, tier2ndLTV: 149.00, tier3rd: 55, tier3rdAOV: 80.20, tier3rdLTV: 240.60, tier6th: 14, tier6thAOV: 92.40, tier6thLTV: 554.40 },
-  { month: "2024-11", product: "Adult Dry Food", tier2nd: 330, tier2ndAOV: 76.00, tier2ndLTV: 152.00, tier3rd: 102, tier3rdAOV: 82.50, tier3rdLTV: 247.50, tier6th: 34, tier6thAOV: 94.80, tier6thLTV: 568.80 },
-  { month: "2024-12", product: "Adult Dry Food", tier2nd: 450, tier2ndAOV: 77.40, tier2ndLTV: 154.80, tier3rd: 155, tier3rdAOV: 84.60, tier3rdLTV: 253.80, tier6th: 62, tier6thAOV: 96.50, tier6thLTV: 579.00 },
-  { month: "2025-01", product: "Adult Dry Food", tier2nd: 580, tier2ndAOV: 78.80, tier2ndLTV: 157.60, tier3rd: 208, tier3rdAOV: 86.20, tier3rdLTV: 258.60, tier6th: 90, tier6thAOV: 98.80, tier6thLTV: 592.80 },
-  { month: "2025-02", product: "Adult Dry Food", tier2nd: 700, tier2ndAOV: 80.20, tier2ndLTV: 160.40, tier3rd: 256, tier3rdAOV: 88.00, tier3rdLTV: 264.00, tier6th: 118, tier6thAOV: 101.20, tier6thLTV: 607.20 },
-  { month: "2025-03", product: "Adult Dry Food", tier2nd: 830, tier2ndAOV: 81.60, tier2ndLTV: 163.20, tier3rd: 310, tier3rdAOV: 89.80, tier3rdLTV: 269.40, tier6th: 140, tier6thAOV: 103.50, tier6thLTV: 621.00 },
-  // Puppy Wet Food — smaller cohort, growing fast
-  { month: "2024-10", product: "Puppy Wet Food", tier2nd: 95, tier2ndAOV: 72.60, tier2ndLTV: 145.20, tier3rd: 24, tier3rdAOV: 78.80, tier3rdLTV: 236.40, tier6th: 5, tier6thAOV: 88.60, tier6thLTV: 531.60 },
-  { month: "2024-11", product: "Puppy Wet Food", tier2nd: 150, tier2ndAOV: 74.20, tier2ndLTV: 148.40, tier3rd: 46, tier3rdAOV: 80.40, tier3rdLTV: 241.20, tier6th: 14, tier6thAOV: 90.50, tier6thLTV: 543.00 },
-  { month: "2024-12", product: "Puppy Wet Food", tier2nd: 205, tier2ndAOV: 75.60, tier2ndLTV: 151.20, tier3rd: 70, tier3rdAOV: 82.20, tier3rdLTV: 246.60, tier6th: 26, tier6thAOV: 93.20, tier6thLTV: 559.20 },
-  { month: "2025-01", product: "Puppy Wet Food", tier2nd: 265, tier2ndAOV: 77.00, tier2ndLTV: 154.00, tier3rd: 95, tier3rdAOV: 84.00, tier3rdLTV: 252.00, tier6th: 38, tier6thAOV: 95.60, tier6thLTV: 573.60 },
-  { month: "2025-02", product: "Puppy Wet Food", tier2nd: 320, tier2ndAOV: 78.40, tier2ndLTV: 156.80, tier3rd: 118, tier3rdAOV: 85.80, tier3rdLTV: 257.40, tier6th: 50, tier6thAOV: 97.80, tier6thLTV: 586.80 },
-  { month: "2025-03", product: "Puppy Wet Food", tier2nd: 380, tier2ndAOV: 79.80, tier2ndLTV: 159.60, tier3rd: 142, tier3rdAOV: 87.60, tier3rdLTV: 262.80, tier6th: 60, tier6thAOV: 100.40, tier6thLTV: 602.40 },
-  // Joint Care — supplement, highest LTV
-  { month: "2024-10", product: "Joint Care", tier2nd: 105, tier2ndAOV: 82.40, tier2ndLTV: 164.80, tier3rd: 28, tier3rdAOV: 90.60, tier3rdLTV: 271.80, tier6th: 7, tier6thAOV: 108.20, tier6thLTV: 649.20 },
-  { month: "2024-11", product: "Joint Care", tier2nd: 165, tier2ndAOV: 84.00, tier2ndLTV: 168.00, tier3rd: 52, tier3rdAOV: 92.80, tier3rdLTV: 278.40, tier6th: 18, tier6thAOV: 110.50, tier6thLTV: 663.00 },
-  { month: "2024-12", product: "Joint Care", tier2nd: 225, tier2ndAOV: 85.80, tier2ndLTV: 171.60, tier3rd: 78, tier3rdAOV: 94.60, tier3rdLTV: 283.80, tier6th: 32, tier6thAOV: 113.40, tier6thLTV: 680.40 },
-  { month: "2025-01", product: "Joint Care", tier2nd: 290, tier2ndAOV: 87.20, tier2ndLTV: 174.40, tier3rd: 104, tier3rdAOV: 96.40, tier3rdLTV: 289.20, tier6th: 46, tier6thAOV: 116.20, tier6thLTV: 697.20 },
-  { month: "2025-02", product: "Joint Care", tier2nd: 345, tier2ndAOV: 88.60, tier2ndLTV: 177.20, tier3rd: 128, tier3rdAOV: 98.20, tier3rdLTV: 294.60, tier6th: 58, tier6thAOV: 118.80, tier6thLTV: 712.80 },
-  { month: "2025-03", product: "Joint Care", tier2nd: 410, tier2ndAOV: 90.40, tier2ndLTV: 180.80, tier3rd: 152, tier3rdAOV: 100.40, tier3rdLTV: 301.20, tier6th: 68, tier6thAOV: 121.60, tier6thLTV: 729.60 },
-  // Dental Sticks — accessory, lower volume, steady
-  { month: "2024-10", product: "Dental Sticks", tier2nd: 80, tier2ndAOV: 68.40, tier2ndLTV: 136.80, tier3rd: 21, tier3rdAOV: 74.20, tier3rdLTV: 222.60, tier6th: 6, tier6thAOV: 84.80, tier6thLTV: 508.80 },
-  { month: "2024-11", product: "Dental Sticks", tier2nd: 130, tier2ndAOV: 70.00, tier2ndLTV: 140.00, tier3rd: 40, tier3rdAOV: 76.00, tier3rdLTV: 228.00, tier6th: 14, tier6thAOV: 86.40, tier6thLTV: 518.40 },
-  { month: "2024-12", product: "Dental Sticks", tier2nd: 165, tier2ndAOV: 71.40, tier2ndLTV: 142.80, tier3rd: 57, tier3rdAOV: 77.80, tier3rdLTV: 233.40, tier6th: 24, tier6thAOV: 88.60, tier6thLTV: 531.60 },
-  { month: "2025-01", product: "Dental Sticks", tier2nd: 195, tier2ndAOV: 72.80, tier2ndLTV: 145.60, tier3rd: 73, tier3rdAOV: 79.60, tier3rdLTV: 238.80, tier6th: 34, tier6thAOV: 90.80, tier6thLTV: 544.80 },
-  { month: "2025-02", product: "Dental Sticks", tier2nd: 235, tier2ndAOV: 74.20, tier2ndLTV: 148.40, tier3rd: 90, tier3rdAOV: 81.40, tier3rdLTV: 244.20, tier6th: 46, tier6thAOV: 93.00, tier6thLTV: 558.00 },
-  { month: "2025-03", product: "Dental Sticks", tier2nd: 280, tier2ndAOV: 75.60, tier2ndLTV: 151.20, tier3rd: 96, tier3rdAOV: 83.20, tier3rdLTV: 249.60, tier6th: 50, tier6thAOV: 95.40, tier6thLTV: 572.40 },
-];
-
-const DEMO_SEGMENTS = [
-  { month: "2024-10", segNew: 580, segActive: 3200, segAtRisk: 1450, segLapsed: 2800, totalCustomers: 8030, avgRFMScore: 2.8, segNewRevenue: 25200, segActiveRevenue: 92800, segAtRiskRevenue: 14500, segLapsedRevenue: 2800, migratedAtRiskToActive: 85, migratedActiveToAtRisk: 145, reactivatedFromLapsed: 45, avgOrdersPerActiveCustomer: 2.1 },
-  { month: "2024-11", segNew: 620, segActive: 3350, segAtRisk: 1380, segLapsed: 2780, totalCustomers: 8130, avgRFMScore: 2.9, segNewRevenue: 27900, segActiveRevenue: 98200, segAtRiskRevenue: 13800, segLapsedRevenue: 2780, migratedAtRiskToActive: 110, migratedActiveToAtRisk: 120, reactivatedFromLapsed: 55, avgOrdersPerActiveCustomer: 2.2 },
-  { month: "2024-12", segNew: 710, segActive: 3520, segAtRisk: 1310, segLapsed: 2720, totalCustomers: 8260, avgRFMScore: 3.0, segNewRevenue: 33500, segActiveRevenue: 105600, segAtRiskRevenue: 13100, segLapsedRevenue: 2720, migratedAtRiskToActive: 130, migratedActiveToAtRisk: 100, reactivatedFromLapsed: 65, avgOrdersPerActiveCustomer: 2.2 },
-  { month: "2025-01", segNew: 640, segActive: 3750, segAtRisk: 1240, segLapsed: 2650, totalCustomers: 8280, avgRFMScore: 3.1, segNewRevenue: 29400, segActiveRevenue: 112500, segAtRiskRevenue: 12400, segLapsedRevenue: 2650, migratedAtRiskToActive: 145, migratedActiveToAtRisk: 95, reactivatedFromLapsed: 50, avgOrdersPerActiveCustomer: 2.3 },
-  { month: "2025-02", segNew: 590, segActive: 3920, segAtRisk: 1160, segLapsed: 2580, totalCustomers: 8250, avgRFMScore: 3.2, segNewRevenue: 27600, segActiveRevenue: 121500, segAtRiskRevenue: 11600, segLapsedRevenue: 2580, migratedAtRiskToActive: 160, migratedActiveToAtRisk: 80, reactivatedFromLapsed: 40, avgOrdersPerActiveCustomer: 2.3 },
-  { month: "2025-03", segNew: 620, segActive: 4100, segAtRisk: 1080, segLapsed: 2500, totalCustomers: 8300, avgRFMScore: 3.3, segNewRevenue: 29800, segActiveRevenue: 131200, segAtRiskRevenue: 10800, segLapsedRevenue: 2500, migratedAtRiskToActive: 175, migratedActiveToAtRisk: 70, reactivatedFromLapsed: 40, avgOrdersPerActiveCustomer: 2.4 },
-];
-
-const DEMO_OUTREACH = [
-  { week: "2025-01-06", channel: "WhatsApp", sends: 3200, delivered: 3104, responses: 1242, responseRate: 40.0, conversions: 128, conversionRate: 4.12, revenue: 9800, cost: 320 },
-  { week: "2025-01-06", channel: "SMS Blast", sends: 8500, delivered: 8245, responses: 742, responseRate: 9.0, conversions: 195, conversionRate: 2.37, revenue: 11200, cost: 680 },
-  { week: "2025-01-06", channel: "Personal Call", sends: 45, delivered: 45, responses: 32, responseRate: 71.1, conversions: 18, conversionRate: 40.0, revenue: 4200, cost: 540 },
-  { week: "2025-01-13", channel: "WhatsApp", sends: 3400, delivered: 3298, responses: 1319, responseRate: 40.0, conversions: 136, conversionRate: 4.12, revenue: 10400, cost: 340 },
-  { week: "2025-01-13", channel: "SMS Blast", sends: 8800, delivered: 8536, responses: 768, responseRate: 9.0, conversions: 202, conversionRate: 2.37, revenue: 11600, cost: 704 },
-  { week: "2025-01-13", channel: "Personal Call", sends: 48, delivered: 48, responses: 34, responseRate: 70.8, conversions: 19, conversionRate: 39.6, revenue: 4500, cost: 576 },
-  { week: "2025-01-13", channel: "Gift-with-Purchase", sends: 250, delivered: 250, responses: 250, responseRate: 100.0, conversions: 250, conversionRate: 100.0, revenue: 6200, cost: 2500 },
-  { week: "2025-01-20", channel: "WhatsApp", sends: 3500, delivered: 3395, responses: 1358, responseRate: 40.0, conversions: 142, conversionRate: 4.18, revenue: 10800, cost: 350 },
-  { week: "2025-01-20", channel: "SMS Blast", sends: 9000, delivered: 8730, responses: 786, responseRate: 9.0, conversions: 208, conversionRate: 2.38, revenue: 12000, cost: 720 },
-  { week: "2025-01-20", channel: "Personal Call", sends: 50, delivered: 50, responses: 36, responseRate: 72.0, conversions: 20, conversionRate: 40.0, revenue: 4800, cost: 600 },
-  { week: "2025-01-27", channel: "WhatsApp", sends: 3600, delivered: 3492, responses: 1397, responseRate: 40.0, conversions: 148, conversionRate: 4.24, revenue: 11200, cost: 360 },
-  { week: "2025-01-27", channel: "SMS Blast", sends: 9200, delivered: 8924, responses: 803, responseRate: 9.0, conversions: 215, conversionRate: 2.41, revenue: 12400, cost: 736 },
-  { week: "2025-01-27", channel: "Personal Call", sends: 52, delivered: 52, responses: 37, responseRate: 71.2, conversions: 21, conversionRate: 40.4, revenue: 5100, cost: 624 },
-  { week: "2025-01-27", channel: "Surprise & Delight", sends: 100, delivered: 100, responses: 85, responseRate: 85.0, conversions: 72, conversionRate: 72.0, revenue: 3600, cost: 1500 },
-  { week: "2025-02-03", channel: "WhatsApp", sends: 3800, delivered: 3686, responses: 1474, responseRate: 40.0, conversions: 156, conversionRate: 4.23, revenue: 11800, cost: 380 },
-  { week: "2025-02-03", channel: "SMS Blast", sends: 12000, delivered: 11640, responses: 1280, responseRate: 11.0, conversions: 310, conversionRate: 2.66, revenue: 18500, cost: 960 },
-  { week: "2025-02-03", channel: "Personal Call", sends: 55, delivered: 55, responses: 39, responseRate: 70.9, conversions: 22, conversionRate: 40.0, revenue: 5400, cost: 660 },
-  { week: "2025-02-10", channel: "WhatsApp", sends: 3900, delivered: 3783, responses: 1551, responseRate: 41.0, conversions: 162, conversionRate: 4.28, revenue: 12200, cost: 390 },
-  { week: "2025-02-10", channel: "SMS Blast", sends: 11500, delivered: 11155, responses: 1227, responseRate: 11.0, conversions: 298, conversionRate: 2.67, revenue: 17800, cost: 920 },
-  { week: "2025-02-10", channel: "Personal Call", sends: 55, delivered: 55, responses: 40, responseRate: 72.7, conversions: 23, conversionRate: 41.8, revenue: 5600, cost: 660 },
-  { week: "2025-02-10", channel: "Gift-with-Purchase", sends: 280, delivered: 280, responses: 280, responseRate: 100.0, conversions: 280, conversionRate: 100.0, revenue: 7000, cost: 2800 },
-  { week: "2025-02-17", channel: "WhatsApp", sends: 4000, delivered: 3880, responses: 1590, responseRate: 41.0, conversions: 168, conversionRate: 4.33, revenue: 12600, cost: 400 },
-  { week: "2025-02-17", channel: "SMS Blast", sends: 11200, delivered: 10864, responses: 1195, responseRate: 11.0, conversions: 290, conversionRate: 2.67, revenue: 17200, cost: 896 },
-  { week: "2025-02-17", channel: "Personal Call", sends: 58, delivered: 58, responses: 42, responseRate: 72.4, conversions: 24, conversionRate: 41.4, revenue: 5800, cost: 696 },
-  { week: "2025-02-24", channel: "WhatsApp", sends: 4100, delivered: 3977, responses: 1631, responseRate: 41.0, conversions: 174, conversionRate: 4.38, revenue: 13000, cost: 410 },
-  { week: "2025-02-24", channel: "SMS Blast", sends: 11000, delivered: 10670, responses: 1174, responseRate: 11.0, conversions: 285, conversionRate: 2.67, revenue: 16800, cost: 880 },
-  { week: "2025-02-24", channel: "Personal Call", sends: 58, delivered: 58, responses: 42, responseRate: 72.4, conversions: 24, conversionRate: 41.4, revenue: 5900, cost: 696 },
-  { week: "2025-02-24", channel: "Surprise & Delight", sends: 120, delivered: 120, responses: 102, responseRate: 85.0, conversions: 86, conversionRate: 71.7, revenue: 4300, cost: 1800 },
-  { week: "2025-03-03", channel: "WhatsApp", sends: 4200, delivered: 4074, responses: 1711, responseRate: 42.0, conversions: 182, conversionRate: 4.47, revenue: 13600, cost: 420 },
-  { week: "2025-03-03", channel: "SMS Blast", sends: 10800, delivered: 10476, responses: 1152, responseRate: 11.0, conversions: 280, conversionRate: 2.67, revenue: 16500, cost: 864 },
-  { week: "2025-03-03", channel: "Personal Call", sends: 60, delivered: 60, responses: 43, responseRate: 71.7, conversions: 25, conversionRate: 41.7, revenue: 6100, cost: 720 },
-  { week: "2025-03-10", channel: "WhatsApp", sends: 4300, delivered: 4171, responses: 1752, responseRate: 42.0, conversions: 188, conversionRate: 4.51, revenue: 14000, cost: 430 },
-  { week: "2025-03-10", channel: "SMS Blast", sends: 10500, delivered: 10185, responses: 1120, responseRate: 11.0, conversions: 272, conversionRate: 2.67, revenue: 16000, cost: 840 },
-  { week: "2025-03-10", channel: "Personal Call", sends: 60, delivered: 60, responses: 44, responseRate: 73.3, conversions: 26, conversionRate: 43.3, revenue: 6300, cost: 720 },
-  { week: "2025-03-10", channel: "Gift-with-Purchase", sends: 300, delivered: 300, responses: 300, responseRate: 100.0, conversions: 300, conversionRate: 100.0, revenue: 7500, cost: 3000 },
-  { week: "2025-03-17", channel: "WhatsApp", sends: 4400, delivered: 4268, responses: 1793, responseRate: 42.0, conversions: 194, conversionRate: 4.55, revenue: 14400, cost: 440 },
-  { week: "2025-03-17", channel: "SMS Blast", sends: 10200, delivered: 9894, responses: 1088, responseRate: 11.0, conversions: 265, conversionRate: 2.68, revenue: 15600, cost: 816 },
-  { week: "2025-03-17", channel: "Personal Call", sends: 62, delivered: 62, responses: 45, responseRate: 72.6, conversions: 26, conversionRate: 41.9, revenue: 6400, cost: 744 },
-  { week: "2025-03-24", channel: "WhatsApp", sends: 4500, delivered: 4365, responses: 1833, responseRate: 42.0, conversions: 200, conversionRate: 4.58, revenue: 14800, cost: 450 },
-  { week: "2025-03-24", channel: "SMS Blast", sends: 10000, delivered: 9700, responses: 1067, responseRate: 11.0, conversions: 260, conversionRate: 2.68, revenue: 15300, cost: 800 },
-  { week: "2025-03-24", channel: "Personal Call", sends: 65, delivered: 65, responses: 47, responseRate: 72.3, conversions: 28, conversionRate: 43.1, revenue: 6800, cost: 780 },
-  { week: "2025-03-24", channel: "Surprise & Delight", sends: 130, delivered: 130, responses: 110, responseRate: 84.6, conversions: 93, conversionRate: 71.5, revenue: 4650, cost: 1950 },
-  { week: "2025-01-06", channel: "Postcard", sends: 2000, delivered: 1900, responses: 114, responseRate: 6.0, conversions: 48, conversionRate: 2.5, revenue: 4800, cost: 1600 },
-  { week: "2025-01-13", channel: "Postcard", sends: 2000, delivered: 1900, responses: 114, responseRate: 6.0, conversions: 50, conversionRate: 2.6, revenue: 5000, cost: 1600 },
-  { week: "2025-01-20", channel: "Postcard", sends: 2100, delivered: 1995, responses: 120, responseRate: 6.0, conversions: 52, conversionRate: 2.6, revenue: 5200, cost: 1680 },
-  { week: "2025-01-27", channel: "Postcard", sends: 2100, delivered: 1995, responses: 120, responseRate: 6.0, conversions: 54, conversionRate: 2.7, revenue: 5400, cost: 1680 },
-  { week: "2025-02-03", channel: "Postcard", sends: 2200, delivered: 2090, responses: 130, responseRate: 6.2, conversions: 58, conversionRate: 2.8, revenue: 5800, cost: 1760 },
-  { week: "2025-02-10", channel: "Postcard", sends: 2200, delivered: 2090, responses: 130, responseRate: 6.2, conversions: 60, conversionRate: 2.9, revenue: 6000, cost: 1760 },
-  { week: "2025-02-17", channel: "Postcard", sends: 2300, delivered: 2185, responses: 140, responseRate: 6.4, conversions: 64, conversionRate: 2.9, revenue: 6400, cost: 1840 },
-  { week: "2025-02-24", channel: "Postcard", sends: 2300, delivered: 2185, responses: 140, responseRate: 6.4, conversions: 66, conversionRate: 3.0, revenue: 6600, cost: 1840 },
-  { week: "2025-03-03", channel: "Postcard", sends: 2400, delivered: 2280, responses: 148, responseRate: 6.5, conversions: 70, conversionRate: 3.1, revenue: 7000, cost: 1920 },
-  { week: "2025-03-10", channel: "Postcard", sends: 2400, delivered: 2280, responses: 148, responseRate: 6.5, conversions: 72, conversionRate: 3.2, revenue: 7200, cost: 1920 },
-  { week: "2025-03-17", channel: "Postcard", sends: 2500, delivered: 2375, responses: 156, responseRate: 6.6, conversions: 76, conversionRate: 3.2, revenue: 7600, cost: 2000 },
-  { week: "2025-03-24", channel: "Postcard", sends: 2500, delivered: 2375, responses: 156, responseRate: 6.6, conversions: 78, conversionRate: 3.3, revenue: 7800, cost: 2000 },
-];
-
-const DEMO_WHATSAPP_FLOWS = [
-  { week: "2025-02-03", flowName: "Welcome Message", sends: 1200, delivered: 1164, responses: 466, conversions: 58, revenue: 4060, cost: 120 },
-  { week: "2025-02-03", flowName: "Abandoned Cart", sends: 850, delivered: 824, responses: 330, conversions: 42, revenue: 3360, cost: 85 },
-  { week: "2025-02-03", flowName: "Re-Order Nudge", sends: 1750, delivered: 1698, responses: 510, conversions: 56, revenue: 4480, cost: 175 },
-  { week: "2025-02-10", flowName: "Welcome Message", sends: 1250, delivered: 1213, responses: 485, conversions: 61, revenue: 4270, cost: 125 },
-  { week: "2025-02-10", flowName: "Abandoned Cart", sends: 880, delivered: 854, responses: 342, conversions: 44, revenue: 3520, cost: 88 },
-  { week: "2025-02-10", flowName: "Re-Order Nudge", sends: 1800, delivered: 1746, responses: 524, conversions: 58, revenue: 4640, cost: 180 },
-  { week: "2025-02-17", flowName: "Welcome Message", sends: 1300, delivered: 1261, responses: 504, conversions: 64, revenue: 4480, cost: 130 },
-  { week: "2025-02-17", flowName: "Abandoned Cart", sends: 920, delivered: 892, responses: 357, conversions: 46, revenue: 3680, cost: 92 },
-  { week: "2025-02-17", flowName: "Re-Order Nudge", sends: 1850, delivered: 1795, responses: 538, conversions: 60, revenue: 4800, cost: 185 },
-  { week: "2025-02-24", flowName: "Welcome Message", sends: 1280, delivered: 1242, responses: 497, conversions: 63, revenue: 4410, cost: 128 },
-  { week: "2025-02-24", flowName: "Abandoned Cart", sends: 900, delivered: 873, responses: 349, conversions: 45, revenue: 3600, cost: 90 },
-  { week: "2025-02-24", flowName: "Re-Order Nudge", sends: 1820, delivered: 1765, responses: 530, conversions: 59, revenue: 4720, cost: 182 },
-  { week: "2025-03-03", flowName: "Welcome Message", sends: 1350, delivered: 1310, responses: 524, conversions: 66, revenue: 4620, cost: 135 },
-  { week: "2025-03-03", flowName: "Abandoned Cart", sends: 950, delivered: 922, responses: 369, conversions: 48, revenue: 3840, cost: 95 },
-  { week: "2025-03-03", flowName: "Re-Order Nudge", sends: 1900, delivered: 1843, responses: 553, conversions: 62, revenue: 4960, cost: 190 },
-  { week: "2025-03-10", flowName: "Welcome Message", sends: 1380, delivered: 1339, responses: 536, conversions: 68, revenue: 4760, cost: 138 },
-  { week: "2025-03-10", flowName: "Abandoned Cart", sends: 980, delivered: 951, responses: 380, conversions: 50, revenue: 4000, cost: 98 },
-  { week: "2025-03-10", flowName: "Re-Order Nudge", sends: 1950, delivered: 1892, responses: 568, conversions: 64, revenue: 5120, cost: 195 },
-  { week: "2025-03-17", flowName: "Welcome Message", sends: 1400, delivered: 1358, responses: 543, conversions: 69, revenue: 4830, cost: 140 },
-  { week: "2025-03-17", flowName: "Abandoned Cart", sends: 1000, delivered: 970, responses: 388, conversions: 51, revenue: 4080, cost: 100 },
-  { week: "2025-03-17", flowName: "Re-Order Nudge", sends: 2000, delivered: 1940, responses: 582, conversions: 66, revenue: 5280, cost: 200 },
-  { week: "2025-03-24", flowName: "Welcome Message", sends: 1420, delivered: 1377, responses: 551, conversions: 70, revenue: 4900, cost: 142 },
-  { week: "2025-03-24", flowName: "Abandoned Cart", sends: 1020, delivered: 989, responses: 396, conversions: 52, revenue: 4160, cost: 102 },
-  { week: "2025-03-24", flowName: "Re-Order Nudge", sends: 2050, delivered: 1989, responses: 597, conversions: 68, revenue: 5440, cost: 205 },
-];
-
-const DEMO_POSTCARD_FLOWS = [
-  { week: "2025-02-03", flowName: "Welcome Pack", sends: 600, delivered: 570, responses: 40, conversions: 18, revenue: 1620, cost: 480 },
-  { week: "2025-02-03", flowName: "Re-Order Reminder", sends: 1100, delivered: 1045, responses: 63, conversions: 28, revenue: 2520, cost: 880 },
-  { week: "2025-02-03", flowName: "Win-Back Mailer", sends: 500, delivered: 475, responses: 29, conversions: 12, revenue: 1080, cost: 400 },
-  { week: "2025-02-10", flowName: "Welcome Pack", sends: 620, delivered: 589, responses: 41, conversions: 19, revenue: 1710, cost: 496 },
-  { week: "2025-02-10", flowName: "Re-Order Reminder", sends: 1120, delivered: 1064, responses: 64, conversions: 29, revenue: 2610, cost: 896 },
-  { week: "2025-02-10", flowName: "Win-Back Mailer", sends: 520, delivered: 494, responses: 30, conversions: 13, revenue: 1170, cost: 416 },
-  { week: "2025-02-17", flowName: "Welcome Pack", sends: 640, delivered: 608, responses: 43, conversions: 20, revenue: 1800, cost: 512 },
-  { week: "2025-02-17", flowName: "Re-Order Reminder", sends: 1150, delivered: 1093, responses: 66, conversions: 30, revenue: 2700, cost: 920 },
-  { week: "2025-02-17", flowName: "Win-Back Mailer", sends: 540, delivered: 513, responses: 31, conversions: 13, revenue: 1170, cost: 432 },
-  { week: "2025-02-24", flowName: "Welcome Pack", sends: 650, delivered: 618, responses: 43, conversions: 20, revenue: 1800, cost: 520 },
-  { week: "2025-02-24", flowName: "Re-Order Reminder", sends: 1160, delivered: 1102, responses: 66, conversions: 30, revenue: 2700, cost: 928 },
-  { week: "2025-02-24", flowName: "Win-Back Mailer", sends: 550, delivered: 523, responses: 31, conversions: 14, revenue: 1260, cost: 440 },
-  { week: "2025-03-03", flowName: "Welcome Pack", sends: 680, delivered: 646, responses: 45, conversions: 21, revenue: 1890, cost: 544 },
-  { week: "2025-03-03", flowName: "Re-Order Reminder", sends: 1200, delivered: 1140, responses: 68, conversions: 31, revenue: 2790, cost: 960 },
-  { week: "2025-03-03", flowName: "Win-Back Mailer", sends: 560, delivered: 532, responses: 32, conversions: 14, revenue: 1260, cost: 448 },
-  { week: "2025-03-10", flowName: "Welcome Pack", sends: 700, delivered: 665, responses: 47, conversions: 22, revenue: 1980, cost: 560 },
-  { week: "2025-03-10", flowName: "Re-Order Reminder", sends: 1220, delivered: 1159, responses: 70, conversions: 32, revenue: 2880, cost: 976 },
-  { week: "2025-03-10", flowName: "Win-Back Mailer", sends: 580, delivered: 551, responses: 33, conversions: 15, revenue: 1350, cost: 464 },
-  { week: "2025-03-17", flowName: "Welcome Pack", sends: 720, delivered: 684, responses: 48, conversions: 23, revenue: 2070, cost: 576 },
-  { week: "2025-03-17", flowName: "Re-Order Reminder", sends: 1250, delivered: 1188, responses: 71, conversions: 33, revenue: 2970, cost: 1000 },
-  { week: "2025-03-17", flowName: "Win-Back Mailer", sends: 600, delivered: 570, responses: 34, conversions: 15, revenue: 1350, cost: 480 },
-  { week: "2025-03-24", flowName: "Welcome Pack", sends: 740, delivered: 703, responses: 49, conversions: 24, revenue: 2160, cost: 592 },
-  { week: "2025-03-24", flowName: "Re-Order Reminder", sends: 1280, delivered: 1216, responses: 73, conversions: 34, revenue: 3060, cost: 1024 },
-  { week: "2025-03-24", flowName: "Win-Back Mailer", sends: 620, delivered: 589, responses: 35, conversions: 16, revenue: 1440, cost: 496 },
-];
-
-// ─── CHANNEL COSTS (monthly, manually added) ───
-const DEMO_CHANNEL_COSTS = [
-  { month: '2025-01', channel: 'Emails', cost: 1200, notes: 'Klaviyo subscription + campaigns' },
-  { month: '2025-01', channel: 'SMS', cost: 2800, notes: 'SMS Blast sends' },
-  { month: '2025-01', channel: 'WhatsApp', cost: 1400, notes: 'WhatsApp Business API' },
-  { month: '2025-01', channel: 'Postcards', cost: 4200, notes: 'Print & postage' },
-  { month: '2025-02', channel: 'Emails', cost: 1250, notes: 'Klaviyo subscription + campaigns' },
-  { month: '2025-02', channel: 'SMS', cost: 3100, notes: 'SMS Blast sends' },
-  { month: '2025-02', channel: 'WhatsApp', cost: 1550, notes: 'WhatsApp Business API' },
-  { month: '2025-02', channel: 'Postcards', cost: 4500, notes: 'Print & postage' },
-  { month: '2025-03', channel: 'Emails', cost: 1300, notes: 'Klaviyo subscription + campaigns' },
-  { month: '2025-03', channel: 'SMS', cost: 3200, notes: 'SMS Blast sends' },
-  { month: '2025-03', channel: 'WhatsApp', cost: 1650, notes: 'WhatsApp Business API' },
-  { month: '2025-03', channel: 'Postcards', cost: 4800, notes: 'Print & postage' },
-];
-
-// ─── PER-PRODUCT CHURN DATA ───
-const DEMO_PRODUCT_CHURN = [
-  // Stress & Anxiety — supplement, moderate churn, improving
-  { month: '2024-10', product: 'Stress & Anxiety', activeSubscribers: 620, churnedSubscribers: 43, churnRate: 6.9, voluntaryChurn: 4.8, involuntaryChurn: 2.1, newSubscribers: 65, reactivated: 8 },
-  { month: '2024-11', product: 'Stress & Anxiety', activeSubscribers: 650, churnedSubscribers: 42, churnRate: 6.5, voluntaryChurn: 4.5, involuntaryChurn: 2.0, newSubscribers: 70, reactivated: 10 },
-  { month: '2024-12', product: 'Stress & Anxiety', activeSubscribers: 688, churnedSubscribers: 44, churnRate: 6.4, voluntaryChurn: 4.4, involuntaryChurn: 2.0, newSubscribers: 78, reactivated: 12 },
-  { month: '2025-01', product: 'Stress & Anxiety', activeSubscribers: 734, churnedSubscribers: 43, churnRate: 5.9, voluntaryChurn: 4.1, involuntaryChurn: 1.8, newSubscribers: 82, reactivated: 9 },
-  { month: '2025-02', product: 'Stress & Anxiety', activeSubscribers: 782, churnedSubscribers: 42, churnRate: 5.4, voluntaryChurn: 3.7, involuntaryChurn: 1.7, newSubscribers: 85, reactivated: 11 },
-  { month: '2025-03', product: 'Stress & Anxiety', activeSubscribers: 836, churnedSubscribers: 40, churnRate: 4.8, voluntaryChurn: 3.3, involuntaryChurn: 1.5, newSubscribers: 90, reactivated: 14 },
-  // Adult Dry Food — staple, high volume, moderate churn
-  { month: '2024-10', product: 'Adult Dry Food', activeSubscribers: 1450, churnedSubscribers: 109, churnRate: 7.5, voluntaryChurn: 5.2, involuntaryChurn: 2.3, newSubscribers: 180, reactivated: 15 },
-  { month: '2024-11', product: 'Adult Dry Food', activeSubscribers: 1536, churnedSubscribers: 115, churnRate: 7.5, voluntaryChurn: 5.3, involuntaryChurn: 2.2, newSubscribers: 195, reactivated: 18 },
-  { month: '2024-12', product: 'Adult Dry Food', activeSubscribers: 1634, churnedSubscribers: 124, churnRate: 7.6, voluntaryChurn: 5.4, involuntaryChurn: 2.2, newSubscribers: 215, reactivated: 20 },
-  { month: '2025-01', product: 'Adult Dry Food', activeSubscribers: 1745, churnedSubscribers: 122, churnRate: 7.0, voluntaryChurn: 4.9, involuntaryChurn: 2.1, newSubscribers: 225, reactivated: 18 },
-  { month: '2025-02', product: 'Adult Dry Food', activeSubscribers: 1866, churnedSubscribers: 121, churnRate: 6.5, voluntaryChurn: 4.5, involuntaryChurn: 2.0, newSubscribers: 235, reactivated: 22 },
-  { month: '2025-03', product: 'Adult Dry Food', activeSubscribers: 2002, churnedSubscribers: 118, churnRate: 5.9, voluntaryChurn: 4.1, involuntaryChurn: 1.8, newSubscribers: 248, reactivated: 25 },
-  // Puppy Wet Food — highest churn as puppies age out
-  { month: '2024-10', product: 'Puppy Wet Food', activeSubscribers: 480, churnedSubscribers: 53, churnRate: 11.0, voluntaryChurn: 8.2, involuntaryChurn: 2.8, newSubscribers: 72, reactivated: 3 },
-  { month: '2024-11', product: 'Puppy Wet Food', activeSubscribers: 502, churnedSubscribers: 53, churnRate: 10.6, voluntaryChurn: 7.9, involuntaryChurn: 2.7, newSubscribers: 75, reactivated: 4 },
-  { month: '2024-12', product: 'Puppy Wet Food', activeSubscribers: 528, churnedSubscribers: 55, churnRate: 10.4, voluntaryChurn: 7.7, involuntaryChurn: 2.7, newSubscribers: 80, reactivated: 5 },
-  { month: '2025-01', product: 'Puppy Wet Food', activeSubscribers: 558, churnedSubscribers: 54, churnRate: 9.7, voluntaryChurn: 7.2, involuntaryChurn: 2.5, newSubscribers: 82, reactivated: 4 },
-  { month: '2025-02', product: 'Puppy Wet Food', activeSubscribers: 590, churnedSubscribers: 54, churnRate: 9.2, voluntaryChurn: 6.8, involuntaryChurn: 2.4, newSubscribers: 84, reactivated: 6 },
-  { month: '2025-03', product: 'Puppy Wet Food', activeSubscribers: 626, churnedSubscribers: 52, churnRate: 8.3, voluntaryChurn: 6.1, involuntaryChurn: 2.2, newSubscribers: 88, reactivated: 6 },
-  // Joint Care — supplement, lowest churn, very sticky
-  { month: '2024-10', product: 'Joint Care', activeSubscribers: 540, churnedSubscribers: 28, churnRate: 5.2, voluntaryChurn: 3.4, involuntaryChurn: 1.8, newSubscribers: 55, reactivated: 6 },
-  { month: '2024-11', product: 'Joint Care', activeSubscribers: 573, churnedSubscribers: 27, churnRate: 4.7, voluntaryChurn: 3.1, involuntaryChurn: 1.6, newSubscribers: 58, reactivated: 7 },
-  { month: '2024-12', product: 'Joint Care', activeSubscribers: 611, churnedSubscribers: 28, churnRate: 4.6, voluntaryChurn: 3.0, involuntaryChurn: 1.6, newSubscribers: 62, reactivated: 8 },
-  { month: '2025-01', product: 'Joint Care', activeSubscribers: 653, churnedSubscribers: 27, churnRate: 4.1, voluntaryChurn: 2.7, involuntaryChurn: 1.4, newSubscribers: 65, reactivated: 7 },
-  { month: '2025-02', product: 'Joint Care', activeSubscribers: 698, churnedSubscribers: 26, churnRate: 3.7, voluntaryChurn: 2.4, involuntaryChurn: 1.3, newSubscribers: 68, reactivated: 9 },
-  { month: '2025-03', product: 'Joint Care', activeSubscribers: 749, churnedSubscribers: 24, churnRate: 3.2, voluntaryChurn: 2.1, involuntaryChurn: 1.1, newSubscribers: 72, reactivated: 10 },
-  // Dental Sticks — accessory, moderate-high churn
-  { month: '2024-10', product: 'Dental Sticks', activeSubscribers: 380, churnedSubscribers: 32, churnRate: 8.4, voluntaryChurn: 6.0, involuntaryChurn: 2.4, newSubscribers: 42, reactivated: 4 },
-  { month: '2024-11', product: 'Dental Sticks', activeSubscribers: 394, churnedSubscribers: 33, churnRate: 8.4, voluntaryChurn: 6.0, involuntaryChurn: 2.4, newSubscribers: 45, reactivated: 5 },
-  { month: '2024-12', product: 'Dental Sticks', activeSubscribers: 411, churnedSubscribers: 34, churnRate: 8.3, voluntaryChurn: 5.9, involuntaryChurn: 2.4, newSubscribers: 48, reactivated: 5 },
-  { month: '2025-01', product: 'Dental Sticks', activeSubscribers: 430, churnedSubscribers: 33, churnRate: 7.7, voluntaryChurn: 5.5, involuntaryChurn: 2.2, newSubscribers: 50, reactivated: 5 },
-  { month: '2025-02', product: 'Dental Sticks', activeSubscribers: 452, churnedSubscribers: 32, churnRate: 7.1, voluntaryChurn: 5.0, involuntaryChurn: 2.1, newSubscribers: 52, reactivated: 6 },
-  { month: '2025-03', product: 'Dental Sticks', activeSubscribers: 478, churnedSubscribers: 30, churnRate: 6.3, voluntaryChurn: 4.4, involuntaryChurn: 1.9, newSubscribers: 55, reactivated: 7 },
-];
-
-const DEMO_BEFORE_AFTER = [
-  { activity: "Loyalty Program Launch", launchDate: "2024-10-01", metric: "Monthly Retention Rate", beforeValue: 78.0, afterValue: 92.4, beforePeriod: "Jul-Sep 2024", afterPeriod: "Mar 2025", lift: 18.5, unit: "percent" },
-  { activity: "Loyalty Program Launch", launchDate: "2024-10-01", metric: "Average Order Value", beforeValue: 74.20, afterValue: 89.50, beforePeriod: "Jul-Sep 2024", afterPeriod: "Mar 2025", lift: 20.6, unit: "currency" },
-  { activity: "Win-Back SMS Campaign", launchDate: "2025-02-03", metric: "Lapsed Reactivation Rate", beforeValue: 1.6, afterValue: 3.8, beforePeriod: "Dec 2024-Jan 2025", afterPeriod: "Feb-Mar 2025", lift: 137.5, unit: "percent" },
-  { activity: "Win-Back SMS Campaign", launchDate: "2025-02-03", metric: "Win-Back Revenue per Week", beforeValue: 2600, afterValue: 3500, beforePeriod: "Dec 2024-Jan 2025", afterPeriod: "Feb-Mar 2025", lift: 34.6, unit: "currency" },
-  { activity: "Re-Engagement Flow Launch", launchDate: "2025-03-03", metric: "At-Risk Save Rate", beforeValue: 5.9, afterValue: 16.2, beforePeriod: "Jan-Feb 2025", afterPeriod: "Mar 2025", lift: 174.6, unit: "percent" },
-  { activity: "WhatsApp Channel Expansion", launchDate: "2025-01-06", metric: "Direct Outreach Revenue/Week", beforeValue: 8200, afterValue: 26250, beforePeriod: "Nov-Dec 2024", afterPeriod: "Mar 2025 avg", lift: 220.1, unit: "currency" },
-];
-
-const DEMO_HOLDOUT_TESTS = [
-  { testName: "Abandoned Cart Flow", testPeriod: "Jan-Mar 2025", sampleSize: 42000, controlSize: 4200, exposedSize: 37800, controlConversionRate: 8.2, exposedConversionRate: 16.0, controlRevPerCustomer: 18.50, exposedRevPerCustomer: 38.20, incrementalConversionLift: 95.1, incrementalRevLift: 106.5, incrementalRevenue: 48200, confidence: 0.96, status: "active" },
-  { testName: "Welcome Series Flow", testPeriod: "Jan-Mar 2025", sampleSize: 14000, controlSize: 1400, exposedSize: 12600, controlConversionRate: 42.0, exposedConversionRate: 60.0, controlRevPerCustomer: 52.00, exposedRevPerCustomer: 78.40, incrementalConversionLift: 42.9, incrementalRevLift: 50.8, incrementalRevenue: 32400, confidence: 0.94, status: "active" },
-  { testName: "Loyalty Points Emails", testPeriod: "Jan-Mar 2025", sampleSize: 18000, controlSize: 1800, exposedSize: 16200, controlConversionRate: 12.5, exposedConversionRate: 18.8, controlRevPerCustomer: 24.00, exposedRevPerCustomer: 36.80, incrementalConversionLift: 50.4, incrementalRevLift: 53.3, incrementalRevenue: 22100, confidence: 0.91, status: "active" },
-  { testName: "WhatsApp Win-Back Nudge", testPeriod: "Feb-Mar 2025", sampleSize: 6000, controlSize: 1500, exposedSize: 4500, controlConversionRate: 2.1, exposedConversionRate: 4.5, controlRevPerCustomer: 4.20, exposedRevPerCustomer: 12.80, incrementalConversionLift: 114.3, incrementalRevLift: 204.8, incrementalRevenue: 8600, confidence: 0.87, status: "active" },
-  { testName: "Post-Purchase Upsell Flow", testPeriod: "Jan-Mar 2025", sampleSize: 22000, controlSize: 2200, exposedSize: 19800, controlConversionRate: 5.8, exposedConversionRate: 17.5, controlRevPerCustomer: 8.20, exposedRevPerCustomer: 28.40, incrementalConversionLift: 201.7, incrementalRevLift: 246.3, incrementalRevenue: 28500, confidence: 0.95, status: "active" },
-];
-
-const DEMO_ACTIVITY_ROI = [
-  { activity: "Welcome Series Flow", channel: "Email", totalCost: 480, attributedRevenue: 66000, incrementalRevenue: 32400, incrementalROI: 66.5, customersInfluenced: 12600, period: "Q1 2025" },
-  { activity: "Abandoned Cart Flow", channel: "Email", totalCost: 620, attributedRevenue: 152000, incrementalRevenue: 48200, incrementalROI: 76.7, customersInfluenced: 37800, period: "Q1 2025" },
-  { activity: "Post-Purchase Upsell Flow", channel: "Email", totalCost: 380, attributedRevenue: 28200, incrementalRevenue: 28500, incrementalROI: 74.0, customersInfluenced: 19800, period: "Q1 2025" },
-  { activity: "Win-Back 60d Flow", channel: "Email", totalCost: 350, attributedRevenue: 35400, incrementalRevenue: 14200, incrementalROI: 39.6, customersInfluenced: 6200, period: "Q1 2025" },
-  { activity: "Re-Engagement 90d Flow", channel: "Email", totalCost: 180, attributedRevenue: 5000, incrementalRevenue: 3200, incrementalROI: 16.8, customersInfluenced: 5064, period: "Mar 2025" },
-  { activity: "Loyalty Program", channel: "Cross-Channel", totalCost: 13260, attributedRevenue: 162400, incrementalRevenue: 42000, incrementalROI: 2.2, customersInfluenced: 3680, period: "Q1 2025" },
-  { activity: "WhatsApp Campaigns", channel: "WhatsApp", totalCost: 4440, attributedRevenue: 148200, incrementalRevenue: 62800, incrementalROI: 13.1, customersInfluenced: 48600, period: "Q1 2025" },
-  { activity: "SMS Blasts", channel: "SMS", totalCost: 9016, attributedRevenue: 179400, incrementalRevenue: 54200, incrementalROI: 5.0, customersInfluenced: 126400, period: "Q1 2025" },
-  { activity: "Personal Calls", channel: "Phone", totalCost: 8016, attributedRevenue: 66900, incrementalRevenue: 45000, incrementalROI: 4.6, customersInfluenced: 715, period: "Q1 2025" },
-  { activity: "Gift-with-Purchase", channel: "In-Box", totalCost: 8300, attributedRevenue: 20700, incrementalRevenue: 12400, incrementalROI: 0.5, customersInfluenced: 830, period: "Q1 2025" },
-  { activity: "Surprise & Delight", channel: "In-Box", totalCost: 5250, attributedRevenue: 12550, incrementalRevenue: 8200, incrementalROI: 0.6, customersInfluenced: 350, period: "Q1 2025" },
-];
 
 // ─── UTILITIES ───
 const formatCurrency = (v) => v == null ? '—' : new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(v);
@@ -756,7 +428,7 @@ const initialState = {
   postcardFlows: DEMO_POSTCARD_FLOWS,
   channelCosts: DEMO_CHANNEL_COSTS,
   productChurn: DEMO_PRODUCT_CHURN,
-  lastUpdated: { emailFlows: 'Demo', loyalty: 'Demo', segments: 'Demo', outreach: 'Demo', beforeAfter: 'Demo', holdoutTests: 'Demo', activityROI: 'Demo', revenue: 'Demo', subscriptions: 'Demo', milestoneProducts: 'Demo', whatsappFlows: 'Demo', postcardFlows: 'Demo', channelCosts: 'Demo', productChurn: 'Demo' },
+  lastUpdated: { emailFlows: null, loyalty: null, segments: null, outreach: null, beforeAfter: null, holdoutTests: null, activityROI: null, revenue: null, subscriptions: null, milestoneProducts: null, whatsappFlows: null, postcardFlows: null, channelCosts: null, productChurn: null },
   settingsOpen: false,
   tabPeriods: { overview: 'weekly', email: 'weekly', loyalty: 'monthly', segments: 'monthly', outreach: 'weekly', incrementality: 'all' },
   dateRange: { start: '2024-10-01', end: '2025-03-24' },
@@ -1011,10 +683,10 @@ function LoginScreen({ onLogin }) {
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
-  const [connStr, setConnStr] = useState(() => localStorage.getItem('crm_neon_connection') || '');
+  const [connStr, setConnStr] = useState(() => getNeonConnection());
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [needsSetup, setNeedsSetup] = useState(!localStorage.getItem('crm_neon_connection'));
+  const [needsSetup, setNeedsSetup] = useState(!getNeonConnection());
 
   const handleConnect = async () => {
     if (!connStr.trim()) { setError('Please enter a Neon connection string.'); return; }
@@ -1033,7 +705,7 @@ function LoginScreen({ onLogin }) {
     if (!username.trim() || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true); setError(null);
     try {
-      const conn = localStorage.getItem('crm_neon_connection');
+      const conn = getNeonConnection();
       const hash = await hashPassword(password);
       const rows = await neonQuery(conn, 'SELECT * FROM users WHERE username = $1', [username.trim().toLowerCase()]);
       if (rows.length === 0) { setError('User not found. Create an account first.'); setLoading(false); return; }
@@ -1054,7 +726,7 @@ function LoginScreen({ onLogin }) {
     if (password.length < 4) { setError('Password must be at least 4 characters.'); return; }
     setLoading(true); setError(null);
     try {
-      const conn = localStorage.getItem('crm_neon_connection');
+      const conn = getNeonConnection();
       const hash = await hashPassword(password);
       const uname = username.trim().toLowerCase();
       const existing = await neonQuery(conn, 'SELECT id FROM users WHERE username = $1', [uname]);
@@ -1140,8 +812,10 @@ function LoginScreen({ onLogin }) {
 }
 
 function SettingsModal({ open, onClose, currentUser }) {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('crm_anthropic_key') || '');
-  const [neonConn, setNeonConn] = useState(() => localStorage.getItem('crm_neon_connection') || '');
+  const [apiKey, setApiKey] = useState(() => getAnthropicKey());
+  const [neonConn, setNeonConn] = useState(() => getNeonConnection());
+  const hasEnvNeon = !!import.meta.env.VITE_NEON_CONNECTION;
+  const hasEnvAnthropicKey = !!import.meta.env.VITE_ANTHROPIC_KEY;
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -1162,7 +836,7 @@ function SettingsModal({ open, onClose, currentUser }) {
     if (newPw !== confirmPw) { setPwMsg({ type: 'error', text: 'New passwords do not match.' }); return; }
     setPwLoading(true); setPwMsg(null);
     try {
-      const conn = localStorage.getItem('crm_neon_connection');
+      const conn = getNeonConnection();
       const currentHash = await hashPassword(currentPw);
       const rows = await neonQuery(conn, 'SELECT password_hash FROM users WHERE id = $1', [currentUser.id]);
       if (rows.length === 0 || rows[0].password_hash !== currentHash) {
@@ -1186,12 +860,22 @@ function SettingsModal({ open, onClose, currentUser }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={labelStyle}>Anthropic API Key (for AI Import)</label>
-            <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-ant-..." style={inputStyle} />
+            {hasEnvAnthropicKey ? (
+              <p style={{ margin: 0, fontSize: 12, color: C.success, fontWeight: 600 }}>Configured via environment variable</p>
+            ) : (
+              <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-ant-..." style={inputStyle} />
+            )}
           </div>
           <div>
-            <label style={labelStyle}>Neon Database Connection String (for Initiatives)</label>
-            <input type="password" value={neonConn} onChange={e => setNeonConn(e.target.value)} placeholder="postgresql://user:pass@ep-xxx.neon.tech/neondb" style={inputStyle} />
-            <p style={{ margin: '4px 0 0', fontSize: 11, color: C.textTertiary }}>Enables persistent initiative tracking with collaboration. Works without it using local demo data.</p>
+            <label style={labelStyle}>Neon Database Connection String</label>
+            {hasEnvNeon ? (
+              <p style={{ margin: 0, fontSize: 12, color: C.success, fontWeight: 600 }}>Configured via environment variable</p>
+            ) : (
+              <>
+                <input type="password" value={neonConn} onChange={e => setNeonConn(e.target.value)} placeholder="postgresql://user:pass@ep-xxx.neon.tech/neondb" style={inputStyle} />
+                <p style={{ margin: '4px 0 0', fontSize: 11, color: C.textTertiary }}>Enables persistent initiative tracking with collaboration. Works without it using local demo data.</p>
+              </>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
@@ -1233,7 +917,7 @@ function UserManagementModal({ open, onClose, currentUser }) {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [msg, setMsg] = useState(null);
 
-  const conn = localStorage.getItem('crm_neon_connection');
+  const conn = getNeonConnection();
 
   const loadUsers = useCallback(async () => {
     if (!open || !conn) return;
@@ -1646,7 +1330,7 @@ function AIDataImporter({ dispatch, onOpenSettings, onLogImport, dashboardState 
   const fileRef = useRef(null);
   const imageRef = useRef(null);
 
-  const apiKey = localStorage.getItem('crm_anthropic_key');
+  const apiKey = getAnthropicKey();
   const schema = DATASET_SCHEMAS[selectedDataset];
 
   const handleFileUpload = (file) => {
@@ -1851,7 +1535,7 @@ function ImportActivityLog({ logs, onClear, currentUser }) {
   const [comments, setComments] = useState({});
   const [commentText, setCommentText] = useState('');
   const [commentCounts, setCommentCounts] = useState({});
-  const connStr = localStorage.getItem('crm_neon_connection');
+  const connStr = getNeonConnection();
 
   useEffect(() => {
     if (!connStr || !logs || logs.length === 0) return;
@@ -1969,6 +1653,16 @@ function ImportActivityLog({ logs, onClear, currentUser }) {
 }
 
 // ─── NEON HELPERS ───
+// Returns the Neon connection string: env var (build-time) → localStorage fallback
+function getNeonConnection() {
+  return import.meta.env.VITE_NEON_CONNECTION || localStorage.getItem('crm_neon_connection') || '';
+}
+
+// Returns the Anthropic API key: env var (build-time) → localStorage fallback
+function getAnthropicKey() {
+  return import.meta.env.VITE_ANTHROPIC_KEY || localStorage.getItem('crm_anthropic_key') || '';
+}
+
 async function neonQuery(connectionString, sqlText, params = []) {
   const sql = neon(connectionString);
   // Build tagged template call: neon requires tagged template syntax
@@ -2119,17 +1813,10 @@ const METRIC_GROUPS = [
 ];
 
 function InitiativesSection({ onOpenSettings, currentUser, presentationMode, onLogActivity, activityLog, dashboardState, dispatch }) {
-  const connStr = localStorage.getItem('crm_neon_connection');
+  const connStr = getNeonConnection();
   const isLocal = !connStr;
   const username = currentUser?.displayName || 'Anonymous';
-  const DEMO_INITIATIVES = [
-    { id: 1, title: 'Launch WhatsApp Win-Back Flow', description: 'Target 60-day lapsed customers with personalised WhatsApp messages and discount code.', status: 'In Progress', priority: 'High', owner: 'Alessandro', due_date: '2025-04-15', category: 'Retention', created_by: 'Alessandro', created_at: '2025-03-01T10:00:00Z' },
-    { id: 2, title: 'Subscription Upsell Email Series', description: 'Create 3-part email series for single-purchase customers to convert to subscription.', status: 'To Do', priority: 'Urgent', owner: 'Marketing', due_date: '2025-04-01', category: 'Growth', created_by: 'Alessandro', created_at: '2025-03-05T09:00:00Z' },
-    { id: 3, title: 'Postcard Re-Order Reminder V2', description: 'Test new creative with product photos and QR code for easy reorder.', status: 'In Progress', priority: 'Medium', owner: 'Alessandro', due_date: '2025-04-20', category: 'Retention', created_by: 'Alessandro', created_at: '2025-03-08T14:00:00Z' },
-    { id: 4, title: 'Milestone Reward: Birthday Bonus', description: 'Add birthday month bonus points for loyalty members to boost engagement.', status: 'To Do', priority: 'Medium', owner: 'CRM Team', due_date: '2025-05-01', category: 'Loyalty', created_by: 'Alessandro', created_at: '2025-03-10T11:00:00Z' },
-    { id: 5, title: 'SMS Abandoned Cart Recovery', description: 'Implement SMS fallback for abandoned cart when email is unopened after 2h.', status: 'Done', priority: 'High', owner: 'Dev Team', due_date: '2025-03-15', category: 'Revenue', created_by: 'Alessandro', created_at: '2025-02-20T08:00:00Z' },
-    { id: 6, title: 'Segment: VIP Early Access', description: 'Create VIP segment for top 5% spenders with early access to new products.', status: 'To Do', priority: 'Low', owner: 'Alessandro', due_date: '2025-05-15', category: 'Growth', created_by: 'Alessandro', created_at: '2025-03-12T16:00:00Z' },
-  ];
+  const DEMO_INITIATIVES = [];
   const [initiatives, setInitiatives] = useState(isLocal ? DEMO_INITIATIVES : []);
   const [comments, setComments] = useState({});
   const [loading, setLoading] = useState(false);
@@ -3371,7 +3058,7 @@ function EmailFlowsSection({ state, presentationMode, dispatch }) {
   };
 
   const organizeFlowScreenshot = async () => {
-    const apiKey = localStorage.getItem('crm_anthropic_key');
+    const apiKey = getAnthropicKey();
     if (!apiKey) { setFlowError('No API key configured. Open Settings.'); return; }
     if (!flowImageData) { setFlowError('Upload a screenshot first'); return; }
     setFlowAiLoading(true); setFlowError(null);
@@ -4270,7 +3957,7 @@ function SegmentsSection({ state, presentationMode, dispatch }) {
   const [showSegLinkForm, setShowSegLinkForm] = useState(false);
   const [editSegLink, setEditSegLink] = useState(null);
   const [segLinkForm, setSegLinkForm] = useState({ name: '', type: 'segment', klaviyo_url: '', description: '', member_count: '' });
-  const connStr = localStorage.getItem('crm_neon_connection');
+  const connStr = getNeonConnection();
   const segUsername = state?.currentUser?.displayName || localStorage.getItem('crm_display_name') || 'Anonymous';
 
   useEffect(() => {
@@ -5194,7 +4881,7 @@ function ChannelCostEntryForm({ dispatch, existingCosts }) {
 }
 
 function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
-  const connStr = localStorage.getItem('crm_neon_connection');
+  const connStr = getNeonConnection();
   const username = currentUser?.displayName || 'Anonymous';
   const [importLogs, setImportLogs] = useState([]);
 
@@ -5248,7 +4935,6 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
         <CSVUploader label="Subscription Data" source="subscriptions" requiredHeaders={['month','activeSubscribers','mrr','churnRate']} dispatch={dispatch} />
       </div>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', paddingTop: 12 }}>
-        <button onClick={() => dispatch({ type: 'RESET_DEMO' })} style={{ padding: '10px 24px', borderRadius: 4, border: `1px solid ${C.primary}`, background: 'transparent', color: C.primary, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>Reset to Demo Data</button>
         <button onClick={() => dispatch({ type: 'CLEAR_ALL' })} style={{ padding: '10px 24px', borderRadius: 4, border: `1px solid ${C.danger}`, background: 'transparent', color: C.danger, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>Clear All Data</button>
       </div>
     </div>
