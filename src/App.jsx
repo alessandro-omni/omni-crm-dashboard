@@ -294,20 +294,30 @@ function computeMetricGroupValues(state, start, end) {
   return r;
 }
 
+// Format date as YYYY-MM-DD in local timezone (avoids UTC shift from toISOString)
+const fmtDate = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
 function getDatePresets() {
-  const anchor = new Date('2025-03-24'); // data end date
-  const fmt = d => d.toISOString().slice(0, 10);
+  const now = new Date();
+  const fmt = fmtDate;
   const sub = (d, n) => { const r = new Date(d); r.setDate(r.getDate() - n); return r; };
+  const y = now.getFullYear(), m = now.getMonth(); // 0-indexed month
+  const monthStart = new Date(y, m, 1);
+  const monthEnd = new Date(y, m + 1, 0); // last day of current month
+  const lastMonthStart = new Date(y, m - 1, 1);
+  const lastMonthEnd = new Date(y, m, 0); // last day of previous month
+  const quarterStart = new Date(y, Math.floor(m / 3) * 3, 1);
+  const quarterEnd = new Date(y, Math.floor(m / 3) * 3 + 3, 0); // last day of current quarter
   return [
-    { label: 'Last 7 days', start: fmt(sub(anchor, 6)), end: fmt(anchor) },
-    { label: 'Last 14 days', start: fmt(sub(anchor, 13)), end: fmt(anchor) },
-    { label: 'Last 30 days', start: fmt(sub(anchor, 29)), end: fmt(anchor) },
-    { label: 'Last 90 days', start: fmt(sub(anchor, 89)), end: fmt(anchor) },
-    { label: 'This month', start: '2025-03-01', end: fmt(anchor) },
-    { label: 'Last month', start: '2025-02-01', end: '2025-02-28' },
-    { label: 'This quarter', start: '2025-01-01', end: fmt(anchor) },
-    { label: 'Last 12 months', start: '2024-04-01', end: fmt(anchor) },
-    { label: 'All time', start: '2024-10-01', end: fmt(anchor) },
+    { label: 'Last 7 days', start: fmt(sub(now, 6)), end: fmt(now) },
+    { label: 'Last 14 days', start: fmt(sub(now, 13)), end: fmt(now) },
+    { label: 'Last 30 days', start: fmt(sub(now, 29)), end: fmt(now) },
+    { label: 'Last 90 days', start: fmt(sub(now, 89)), end: fmt(now) },
+    { label: 'This month', start: fmt(monthStart), end: fmt(monthEnd) },
+    { label: 'Last month', start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
+    { label: 'This quarter', start: fmt(quarterStart), end: fmt(quarterEnd) },
+    { label: 'Last 12 months', start: fmt(sub(now, 364)), end: fmt(now) },
+    { label: 'All time', start: '2024-01-01', end: fmt(now) },
   ];
 }
 
@@ -431,8 +441,8 @@ const initialState = {
   lastUpdated: { emailFlows: null, loyalty: null, segments: null, outreach: null, beforeAfter: null, holdoutTests: null, activityROI: null, revenue: null, subscriptions: null, milestoneProducts: null, whatsappFlows: null, postcardFlows: null, channelCosts: null, productChurn: null },
   settingsOpen: false,
   tabPeriods: { overview: 'weekly', email: 'weekly', loyalty: 'monthly', segments: 'monthly', outreach: 'weekly', incrementality: 'all' },
-  dateRange: { start: '2024-10-01', end: '2025-03-24' },
-  pendingDateRange: { start: '2024-10-01', end: '2025-03-24' },
+  dateRange: { start: fmtDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), end: fmtDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)) },
+  pendingDateRange: { start: fmtDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), end: fmtDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)) },
   comparison: 'none',
   pendingComparison: 'none',
   dateMode: 'fixed',
