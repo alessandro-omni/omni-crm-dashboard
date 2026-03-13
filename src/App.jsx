@@ -1762,7 +1762,7 @@ async function initNeonTables(connectionString) {
 async function saveDashboardData(connStr, dataKey, dataValue) {
   if (!connStr) return;
   try {
-    await neonQuery(connStr, 'INSERT INTO dashboard_data (data_key, data_value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (data_key) DO UPDATE SET data_value = $2, updated_at = NOW()', [dataKey, JSON.stringify(dataValue)]);
+    await neonQuery(connStr, 'INSERT INTO dashboard_data (data_key, data_value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (data_key) DO UPDATE SET data_value = EXCLUDED.data_value, updated_at = NOW()', [dataKey, JSON.stringify(dataValue)]);
   } catch (e) { console.warn('Failed to save dashboard data to Neon:', e); }
 }
 
@@ -2293,13 +2293,47 @@ function InitiativesSection({ onOpenSettings, currentUser, presentationMode, onL
       s.addText(`Completion: ${d.completionRate.toFixed(0)}%`, { x: barX, y: barY - 0.35, w: barW, h: 0.3, fontSize: 11, fontFace: 'Arial', bold: true, color: '272D45' });
     };
 
+    // Helper: add image to any slide if present (as a separate slide if main slide is full, or inline)
+    const addSlideImage = (s, slide, yOffset) => {
+      if (!slide.image || !slide.image.dataUrl) return;
+      const imgH = Math.min(4, 7.5 - yOffset - 0.5);
+      if (imgH > 0.5) {
+        s.addImage({ data: slide.image.dataUrl, x: 0.5, y: yOffset, w: 8, h: imgH, sizing: { type: 'contain', w: 8, h: imgH } });
+      } else {
+        // Not enough space — add a continuation slide with the image
+        const s2 = pptx.addSlide();
+        s2.background = { color: 'FFFFFF' };
+        s2.addShape(pptx.shapes.RECTANGLE, { x: 0, y: 0, w: '100%', h: 0.8, fill: { color: BG } });
+        s2.addText((slide.title || 'Untitled') + ' (cont.)', { x: 0.5, y: 0.1, w: 9, h: 0.6, fontSize: 24, fontFace: 'Arial', color: 'FFFFFF', bold: true });
+        s2.addImage({ data: slide.image.dataUrl, x: 0.5, y: 1.2, w: 12, h: 5.5, sizing: { type: 'contain', w: 12, h: 5.5 } });
+        s2.addText('omni.pet CRM Dashboard', { x: 0.5, y: 7.0, w: 4, h: 0.3, fontSize: 8, fontFace: 'Arial', color: '9CA3AF' });
+      }
+    };
+
     presentationSlides.forEach(slide => {
       const s = pptx.addSlide();
       s.background = { color: 'FFFFFF' };
       switch (slide.type) {
-        case 'title': renderTitleSlide(s, slide); break;
-        case 'metrics': (slide.metricData && slide.metricData.length > 0) ? renderMetricsSlide(s, slide) : renderBulletSlide(s, slide); break;
-        case 'summary': slide.initiativeData ? renderSummarySlide(s, slide) : renderBulletSlide(s, slide); break;
+        case 'title':
+          renderTitleSlide(s, slide);
+          if (slide.image) addSlideImage(s, slide, 5.5);
+          break;
+        case 'metrics':
+          if (slide.metricData && slide.metricData.length > 0) {
+            renderMetricsSlide(s, slide);
+            if (slide.image) addSlideImage(s, slide, 6.2);
+          } else {
+            renderBulletSlide(s, slide);
+          }
+          break;
+        case 'summary':
+          if (slide.initiativeData) {
+            renderSummarySlide(s, slide);
+            if (slide.image) addSlideImage(s, slide, 6.5);
+          } else {
+            renderBulletSlide(s, slide);
+          }
+          break;
         default: renderBulletSlide(s, slide); break;
       }
       s.addText('omni.pet CRM Dashboard', { x: 0.5, y: 7.0, w: 4, h: 0.3, fontSize: 8, fontFace: 'Arial', color: '9CA3AF' });
@@ -4993,15 +5027,29 @@ export default function App() {
 
   const openSettings = useCallback(() => setSettingsOpen(true), []);
 
-  // Logged dispatch: wraps dispatch to auto-log tracked actions
+  // Keep a ref to current state for async persistence
+  const stateRef = useRef(state);
+  useEffect(() => { stateRef.current = state; });
+
+  // Logged dispatch: wraps dispatch to auto-log tracked actions + persist to Neon
   const loggedDispatch = useCallback((action) => {
     dispatch(action);
     const user = currentUser?.displayName || 'Anonymous';
+    const conn = getNeonConnection();
     if (action.type === 'LOAD_DATA') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Data Import', category: action.source, detail: `Loaded ${Array.isArray(action.payload) ? action.payload.length : 0} rows into ${action.source}`, user } });
+      // Persist directly — we have the full payload
+      if (conn && DATA_KEYS.includes(action.source)) saveDashboardData(conn, action.source, action.payload);
     }
     if (action.type === 'APPEND_DATA') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Flow Added', category: action.source || 'emailFlows', detail: `Added ${action.payload?.length || 0} row(s)`, user } });
+      // Persist full array after state updates (use timeout to get post-dispatch state)
+      const src = action.source || 'emailFlows';
+      if (conn && DATA_KEYS.includes(src)) {
+        const currentData = stateRef.current[src] || [];
+        const merged = [...currentData, ...(action.payload || [])];
+        saveDashboardData(conn, src, merged);
+      }
     }
     if (action.type === 'ADD_SEGMENT_LINK') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Segment Link Created', category: 'segments', detail: `Created: ${action.payload?.name || ''}`, user } });
@@ -5011,9 +5059,13 @@ export default function App() {
     }
     if (action.type === 'RESET_DEMO') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Reset to Demo', category: 'system', detail: 'All data reset to demo values', user } });
+      // Clear all Neon data on reset
+      if (conn) DATA_KEYS.forEach(key => saveDashboardData(conn, key, initialState[key]));
     }
     if (action.type === 'CLEAR_ALL') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Clear All Data', category: 'system', detail: 'All data cleared', user } });
+      // Clear all Neon data
+      if (conn) DATA_KEYS.forEach(key => saveDashboardData(conn, key, []));
     }
   }, [currentUser]);
 
@@ -5035,41 +5087,21 @@ export default function App() {
     }
   }, []);
 
-  // ── Load dashboard data from Neon on mount, then persist changes ──
+  // ── Load dashboard data from Neon on mount ──
   const neonInitDone = useRef(false);
-  const skipPersist = useRef(true); // skip first persist cycle (initial load)
   useEffect(() => {
     const conn = getNeonConnection();
     if (!conn || neonInitDone.current) return;
     neonInitDone.current = true;
     loadAllDashboardData(conn).then(data => {
-      if (data) {
-        DATA_KEYS.forEach(key => {
-          if (data[key] && Array.isArray(data[key]) && data[key].length > 0) {
-            dispatch({ type: 'LOAD_DATA', source: key, payload: data[key] });
-          }
-        });
-      }
-      // Allow persisting after initial load completes
-      setTimeout(() => { skipPersist.current = false; }, 500);
-    }).catch(() => { skipPersist.current = false; });
+      if (!data) return;
+      DATA_KEYS.forEach(key => {
+        if (data[key] && Array.isArray(data[key]) && data[key].length > 0) {
+          dispatch({ type: 'LOAD_DATA', source: key, payload: data[key] });
+        }
+      });
+    }).catch(e => console.warn('Failed to load dashboard data:', e));
   }, []);
-
-  // ── Persist dashboard data to Neon when it changes ──
-  const prevDataRef = useRef({});
-  useEffect(() => {
-    if (skipPersist.current) return;
-    const conn = getNeonConnection();
-    if (!conn) return;
-    DATA_KEYS.forEach(key => {
-      if (state[key] !== prevDataRef.current[key] && state[key] !== undefined) {
-        saveDashboardData(conn, key, state[key]);
-      }
-    });
-    const refs = {};
-    DATA_KEYS.forEach(key => { refs[key] = state[key]; });
-    prevDataRef.current = refs;
-  }, [state.emailFlows, state.loyalty, state.segments, state.outreach, state.beforeAfter, state.holdoutTests, state.activityROI, state.revenue, state.subscriptions, state.milestoneProducts, state.whatsappFlows, state.postcardFlows, state.channelCosts, state.productChurn]);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('crm_user_id');
