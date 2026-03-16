@@ -697,8 +697,8 @@ function CSVUploader({ label, source, requiredHeaders, dispatch }) {
         const headers = results.meta.fields || [];
         const missing = requiredHeaders.filter(h => !headers.includes(h));
         if (missing.length > 0) { setStatus({ ok: false, msg: `Missing columns: ${missing.join(', ')}` }); return; }
-        dispatch({ type: 'LOAD_DATA', source, payload: results.data });
-        setStatus({ ok: true, msg: `Loaded ${results.data.length} rows` });
+        dispatch({ type: 'APPEND_DATA', source, payload: results.data });
+        setStatus({ ok: true, msg: `Added ${results.data.length} rows` });
       },
       error: (err) => setStatus({ ok: false, msg: err.message }),
     });
@@ -1496,7 +1496,7 @@ RULES:
 
   const importData = () => {
     if (!preview) return;
-    dispatch({ type: 'LOAD_DATA', source: selectedDataset, payload: preview });
+    dispatch({ type: 'APPEND_DATA', source: selectedDataset, payload: preview });
     if (onLogImport) onLogImport({ dataset: schema.label, datasetKey: selectedDataset, inputMode, rowCount: preview.length, summary: summary || `${preview.length} rows imported`, importedRows: preview });
     setPreview(null); setSummary(null); setRawInput(''); setImageData(null); setImagePreviewUrl(null); setError(null);
   };
