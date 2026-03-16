@@ -5169,6 +5169,86 @@ function DataManager({ state, dispatch }) {
   );
 }
 
+function ClearAllDataButton({ dispatch, currentUser }) {
+  const [step, setStep] = useState(0); // 0=idle, 1=password, 2=type DELETE
+  const [pw, setPw] = useState('');
+  const [confirmText, setConfirmText] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const reset = () => { setStep(0); setPw(''); setConfirmText(''); setError(''); setLoading(false); };
+
+  const verifyPassword = async () => {
+    if (!pw.trim()) { setError('Enter your password'); return; }
+    setLoading(true); setError('');
+    try {
+      const conn = getNeonConnection();
+      if (!conn || !currentUser?.id) { setError('Not connected'); setLoading(false); return; }
+      const hash = await hashPassword(pw);
+      const rows = await neonQuery(conn, 'SELECT password_hash FROM users WHERE id = $1', [currentUser.id]);
+      if (rows.length === 0 || rows[0].password_hash !== hash) { setError('Incorrect password'); setLoading(false); return; }
+      setStep(2); setLoading(false);
+    } catch (e) { setError('Verification failed'); setLoading(false); }
+  };
+
+  const executeClear = () => {
+    if (confirmText !== 'DELETE') { setError('Type DELETE to confirm'); return; }
+    dispatch({ type: 'CLEAR_ALL' });
+    reset();
+  };
+
+  if (step === 0) {
+    return (
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', paddingTop: 12 }}>
+        <button onClick={() => setStep(1)} style={{ padding: '10px 24px', borderRadius: 4, border: `1px solid ${C.danger}`, background: 'transparent', color: C.danger, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>Clear All Data</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ margin: '12px auto', maxWidth: 400, padding: 20, background: '#FEF2F2', borderRadius: 8, border: `2px solid ${C.danger}` }}>
+      <h4 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: C.danger }}>Clear All Data</h4>
+      <p style={{ margin: '0 0 12px', fontSize: 12, color: '#991B1B' }}>This will permanently delete all imported dashboard data.</p>
+
+      {step === 1 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: '#991B1B' }}>Step 1: Enter your password</label>
+          <input
+            type="password" value={pw} onChange={e => setPw(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && verifyPassword()}
+            placeholder="Your account password"
+            autoFocus
+            style={{ padding: '8px 12px', borderRadius: 4, border: `1px solid ${error ? C.danger : '#D1D5DB'}`, fontSize: 13, fontFamily: 'inherit' }}
+          />
+          {error && <span style={{ fontSize: 11, color: C.danger }}>{error}</span>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={verifyPassword} disabled={loading} style={{ padding: '8px 16px', borderRadius: 4, border: 'none', background: C.danger, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>{loading ? 'Verifying...' : 'Continue'}</button>
+            <button onClick={reset} style={{ padding: '8px 16px', borderRadius: 4, border: `1px solid #D1D5DB`, background: 'transparent', color: C.textSecondary, fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: '#991B1B' }}>Step 2: Type <strong>DELETE</strong> to confirm</label>
+          <input
+            type="text" value={confirmText} onChange={e => setConfirmText(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && executeClear()}
+            placeholder="Type DELETE"
+            autoFocus
+            style={{ padding: '8px 12px', borderRadius: 4, border: `1px solid ${error ? C.danger : '#D1D5DB'}`, fontSize: 13, fontFamily: 'inherit', letterSpacing: 1 }}
+          />
+          {error && <span style={{ fontSize: 11, color: C.danger }}>{error}</span>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={executeClear} disabled={confirmText !== 'DELETE'} style={{ padding: '8px 16px', borderRadius: 4, border: 'none', background: confirmText === 'DELETE' ? C.danger : '#D1D5DB', color: confirmText === 'DELETE' ? '#fff' : C.textTertiary, fontSize: 12, fontWeight: 600, cursor: confirmText === 'DELETE' ? 'pointer' : 'default' }}>Permanently Delete All Data</button>
+            <button onClick={reset} style={{ padding: '8px 16px', borderRadius: 4, border: `1px solid #D1D5DB`, background: 'transparent', color: C.textSecondary, fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
   const connStr = getNeonConnection();
   const username = currentUser?.displayName || 'Anonymous';
@@ -5224,9 +5304,7 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
         <CSVUploader label="Revenue Data" source="revenue" requiredHeaders={['week','totalRevenue','netRevenue']} dispatch={dispatch} />
         <CSVUploader label="Subscription Data" source="subscriptions" requiredHeaders={['month','activeSubscribers','mrr','churnRate']} dispatch={dispatch} />
       </div>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', paddingTop: 12 }}>
-        <button onClick={() => dispatch({ type: 'CLEAR_ALL' })} style={{ padding: '10px 24px', borderRadius: 4, border: `1px solid ${C.danger}`, background: 'transparent', color: C.danger, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>Clear All Data</button>
-      </div>
+      <ClearAllDataButton dispatch={dispatch} currentUser={currentUser} />
     </div>
   );
 }
