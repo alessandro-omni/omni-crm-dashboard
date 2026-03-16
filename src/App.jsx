@@ -5211,7 +5211,6 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <AIDataImporter dispatch={dispatch} onOpenSettings={onOpenSettings} onLogImport={handleLogImport} dashboardState={state} />
-      <DataManager state={state} dispatch={dispatch} />
       <ChannelCostEntryForm dispatch={dispatch} existingCosts={state.channelCosts} />
       <ImportActivityLog logs={importLogs} onClear={clearLogs} currentUser={currentUser} dispatch={dispatch} state={state} onReloadLogs={loadLogs} />
       <h3 style={{ margin: '12px 0 0', fontSize: 15, fontWeight: 600, color: C.textPrimary }}>Manual CSV Upload</h3>
