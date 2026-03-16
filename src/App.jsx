@@ -181,6 +181,48 @@ function getChannelCostAndROI(channelCosts, channelName, totalRevenue, start, en
 
 // ─── TABS ───
 // ─── DATE RANGE UTILITIES ───
+// Normalize a date string to the Monday of its ISO week (for weekly bucketing)
+function toWeekStart(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay(); // 0=Sun, 1=Mon...
+  const diff = day === 0 ? -6 : 1 - day; // adjust to Monday
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
+// Bucket emailFlows rows by ISO week (aggregate rows with different dates into weekly groups)
+function bucketByWeek(data) {
+  if (!data || !data.length) return data;
+  // Group by (weekStart, type, flowName)
+  const map = {};
+  data.forEach(row => {
+    const wk = toWeekStart(row.week || '');
+    const key = `${wk}|${row.type || ''}|${row.flowName || ''}`;
+    if (!map[key]) {
+      map[key] = { ...row, week: wk, sends: 0, delivered: 0, opens: 0, clicks: 0, unsubscribes: 0, revenue: 0, conversions: 0, _count: 0, _openRateSum: 0, _ctrSum: 0, _unsubRateSum: 0 };
+    }
+    const m = map[key];
+    m.sends += (row.sends || 0);
+    m.delivered += (row.delivered || 0);
+    m.opens += (row.opens || 0);
+    m.clicks += (row.clicks || 0);
+    m.unsubscribes += (row.unsubscribes || 0);
+    m.revenue += (row.revenue || 0);
+    m.conversions += (row.conversions || 0);
+    m._count += 1;
+    m._openRateSum += (row.openRate || 0);
+    m._ctrSum += (row.ctr || 0);
+    m._unsubRateSum += (row.unsubRate || 0);
+    if (row.listSize) m.listSize = row.listSize; // take latest
+  });
+  return Object.values(map).map(m => ({
+    ...m,
+    openRate: m._count > 0 ? m._openRateSum / m._count : 0,
+    ctr: m._count > 0 ? m._ctrSum / m._count : 0,
+    unsubRate: m._count > 0 ? m._unsubRateSum / m._count : 0,
+  }));
+}
+
 function filterByDateRange(data, start, end, dateField = 'week') {
   if (!data || !data.length) return data;
   return data.filter(row => {
@@ -462,6 +504,8 @@ function reducer(state, action) {
     case 'APPEND_DATA': return { ...state, [action.source]: [...(state[action.source] || []), ...action.payload], lastUpdated: { ...state.lastUpdated, [action.source]: new Date().toLocaleString('en-GB') } };
     case 'RESET_DEMO': return { ...initialState, activeTab: state.activeTab, settingsOpen: state.settingsOpen, tabPeriods: state.tabPeriods };
     case 'CLEAR_ALL': return { ...state, emailFlows: [], loyalty: [], segments: [], outreach: [], beforeAfter: [], holdoutTests: [], activityROI: [], revenue: [], subscriptions: [], milestoneProducts: [], whatsappFlows: [], postcardFlows: [], channelCosts: [], productChurn: [], lastUpdated: Object.fromEntries(Object.keys(state.lastUpdated).map(k => [k, 'Cleared'])) };
+    case 'CLEAR_DATASET': return { ...state, [action.source]: [], lastUpdated: { ...state.lastUpdated, [action.source]: 'Cleared' } };
+    case 'DELETE_ROWS': { const idxSet = new Set(action.indices); return { ...state, [action.source]: state[action.source].filter((_, i) => !idxSet.has(i)), lastUpdated: { ...state.lastUpdated, [action.source]: new Date().toLocaleString('en-GB') } }; }
     case 'TOGGLE_SETTINGS': return { ...state, settingsOpen: !state.settingsOpen };
     case 'SET_TAB_PERIOD': return { ...state, tabPeriods: { ...state.tabPeriods, [action.tab]: action.period } };
     case 'TOGGLE_DATE_PICKER': return { ...state, datePickerOpen: !state.datePickerOpen, pendingDateRange: state.dateRange, pendingComparison: state.comparison, pendingDateMode: state.dateMode };
@@ -1338,6 +1382,7 @@ function AIDataImporter({ dispatch, onOpenSettings, onLogImport, dashboardState 
   const [error, setError] = useState(null);
   const [imageData, setImageData] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const [screenshotNotes, setScreenshotNotes] = useState('');
   const [importDateStart, setImportDateStart] = useState(dashboardState?.dateRange?.start || '');
   const [importDateEnd, setImportDateEnd] = useState(dashboardState?.dateRange?.end || '');
   const fileRef = useRef(null);
@@ -1411,9 +1456,10 @@ RULES:
     try {
       let messages;
       if (inputMode === 'screenshot') {
+        const notesPart = screenshotNotes.trim() ? `\n\nUser notes about this screenshot:\n${screenshotNotes.trim()}` : '';
         messages = [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: imageData.mediaType, data: imageData.base64 } },
-          { type: 'text', text: `Extract the data from this screenshot and convert it into the ${schema.label} format. Read every row visible in the image carefully.` }
+          { type: 'text', text: `Extract the data from this screenshot and convert it into the ${schema.label} format. Read every row visible in the image carefully.${notesPart}` }
         ]}];
       } else {
         messages = [{ role: 'user', content: `Convert this data into the ${schema.label} format:\n\n${rawInput}` }];
@@ -1511,6 +1557,12 @@ RULES:
             </div>
           )}
           <input ref={imageRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" style={{ display: 'none' }} onChange={e => handleImageUpload(e.target.files?.[0])} />
+        </div>
+      )}
+      {inputMode === 'screenshot' && (
+        <div style={{ marginTop: 10 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, color: C.textSecondary, marginBottom: 4, display: 'block' }}>Context / Instructions <span style={{ fontWeight: 400, color: C.textTertiary }}>(optional but recommended)</span></label>
+          <textarea value={screenshotNotes} onChange={e => setScreenshotNotes(e.target.value)} placeholder="Describe what's in the screenshot to guide the AI, e.g.:\n• This is a Klaviyo campaigns list for March 2026\n• Each row is a separate campaign — extract sends, open rate, click rate, and revenue\n• Ignore the top summary row, only use individual campaign rows\n• Revenue is in GBP" rows={3} style={{ width: '100%', padding: '8px 12px', borderRadius: 4, border: `1px solid ${C.cardBorder}`, fontSize: 12, resize: 'vertical', background: C.pageBg, color: C.textPrimary, boxSizing: 'border-box', lineHeight: 1.5 }} />
         </div>
       )}
       <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center' }}>
@@ -2870,8 +2922,8 @@ function OverviewSection({ state, presentationMode, dispatch }) {
   const latestOutreachWeek = [...new Set(fOutreach.map(r => r.week))].sort().pop();
   const latestOutreachRev = fOutreach.filter(r => r.week === latestOutreachWeek).reduce((s, r) => s + (r.revenue || 0), 0);
   const crmRevWeek = latestEmailRev + latestOutreachRev;
-  const latestTotalRev = fRevenue.length > 0 ? fRevenue[fRevenue.length - 1].totalRevenue : 1;
-  const crmPct = (crmRevWeek / latestTotalRev) * 100;
+  const latestTotalRev = fRevenue.length > 0 ? fRevenue.reduce((s, r) => s + (r.totalRevenue || 0), 0) : 0;
+  const crmPct = latestTotalRev > 0 ? (crmRevWeek / latestTotalRev) * 100 : (crmRevWeek > 0 ? 100 : 0);
   const latestLoyalty = fLoyalty.length > 0 ? fLoyalty[fLoyalty.length - 1] : null;
   const latestSeg = fSegments.length > 0 ? fSegments[fSegments.length - 1] : null;
   const totalCost = state.activityROI.reduce((s, r) => s + r.totalCost, 0);
@@ -3208,16 +3260,21 @@ function EmailFlowsSection({ state, presentationMode, dispatch }) {
   const compLabel = COMP_LABELS[state.comparison] || null;
   const filtered = useMemo(() => filterByDateRange(state.emailFlows, start, end, 'week'), [state.emailFlows, start, end]);
   const period = state.tabPeriods.email || 'weekly';
-  const data = period === 'monthly' ? aggregateEmailFlowsByMonth(filtered) : filtered;
+  const data = period === 'monthly' ? aggregateEmailFlowsByMonth(filtered) : bucketByWeek(filtered);
   const weeks = [...new Set(data.map(r => r.week))].sort();
   const latestWeek = weeks[weeks.length - 1];
   const latestData = data.filter(r => r.week === latestWeek);
   const latestCampaign = latestData.find(r => r.type === 'Campaign');
-  const totalEmailRev = latestData.reduce((s, r) => s + (r.revenue || 0), 0);
-  const flowRev = latestData.filter(r => r.type === 'Flow').reduce((s, r) => s + (r.revenue || 0), 0);
+  // Sum across the entire filtered range (not just latest week)
+  const totalEmailRev = period === 'weekly'
+    ? latestData.reduce((s, r) => s + (r.revenue || 0), 0)
+    : filtered.reduce((s, r) => s + (r.revenue || 0), 0);
+  const flowRev = period === 'weekly'
+    ? latestData.filter(r => r.type === 'Flow').reduce((s, r) => s + (r.revenue || 0), 0)
+    : filtered.filter(r => r.type === 'Flow').reduce((s, r) => s + (r.revenue || 0), 0);
   const fRevenue = useMemo(() => filterByDateRange(state.revenue, start, end, 'week'), [state.revenue, start, end]);
-  const totalRev = fRevenue.length > 0 ? fRevenue[fRevenue.length - 1].totalRevenue : 1;
-  const emailPct = (totalEmailRev / totalRev) * 100;
+  const totalRev = fRevenue.length > 0 ? fRevenue.reduce((s, r) => s + (r.totalRevenue || 0), 0) : 0;
+  const emailPct = totalRev > 0 ? (totalEmailRev / totalRev) * 100 : (totalEmailRev > 0 ? 100 : 0);
 
   // Channel cost & ROI from state.channelCosts
   const totalEmailRevRange = filtered.reduce((s, r) => s + (r.revenue || 0), 0);
@@ -3227,7 +3284,7 @@ function EmailFlowsSection({ state, presentationMode, dispatch }) {
   const compEmailFlows = useMemo(() => compRange ? filterByDateRange(state.emailFlows, compRange.start, compRange.end, 'week') : [], [state.emailFlows, compRange]);
   const compEmail = useMemo(() => {
     if (!compRange || !compEmailFlows.length) return null;
-    const cData = period === 'monthly' ? aggregateEmailFlowsByMonth(compEmailFlows) : compEmailFlows;
+    const cData = period === 'monthly' ? aggregateEmailFlowsByMonth(compEmailFlows) : bucketByWeek(compEmailFlows);
     const cWeeks = [...new Set(cData.map(r => r.week))].sort();
     const cLatest = cWeeks[cWeeks.length - 1];
     const cLatestData = cData.filter(r => r.week === cLatest);
@@ -3242,16 +3299,16 @@ function EmailFlowsSection({ state, presentationMode, dispatch }) {
   // Build comparison weekly totals for overlay line
   const compWeeklyTotals = useMemo(() => {
     if (!compRange || !compEmailFlows.length) return [];
-    const cData = period === 'monthly' ? aggregateEmailFlowsByMonth(compEmailFlows) : compEmailFlows;
+    const cData = period === 'monthly' ? aggregateEmailFlowsByMonth(compEmailFlows) : bucketByWeek(compEmailFlows);
     const cWeeks = [...new Set(cData.map(r => r.week))].sort();
     return cWeeks.map(w => cData.filter(r => r.week === w).reduce((s, r) => s + (r.revenue || 0), 0));
   }, [compRange, compEmailFlows, period]);
 
   const weeklyData = weeks.map((w, i) => {
     const rows = data.filter(r => r.week === w);
-    const camp = rows.find(r => r.type === 'Campaign');
+    const campR = rows.filter(r => r.type === 'Campaign').reduce((s, r) => s + (r.revenue || 0), 0);
     const flowR = rows.filter(r => r.type === 'Flow').reduce((s, r) => s + (r.revenue || 0), 0);
-    const entry = { week: w.slice(5), campaignRevenue: camp?.revenue || 0, flowRevenue: flowR };
+    const entry = { week: w.slice(5), campaignRevenue: campR, flowRevenue: flowR };
     if (compWeeklyTotals.length > 0) entry.prevTotalRev = compWeeklyTotals[i] ?? null;
     return entry;
   });
@@ -4982,6 +5039,100 @@ function ChannelCostEntryForm({ dispatch, existingCosts }) {
   );
 }
 
+function DataManager({ state, dispatch }) {
+  const [expanded, setExpanded] = useState(null);
+  const [selected, setSelected] = useState({});
+  const datasets = DATA_KEYS.map(k => ({ key: k, label: DATASET_SCHEMAS[k]?.label || k, count: (state[k] || []).length })).filter(d => d.count > 0);
+
+  const toggleExpand = (key) => { setExpanded(expanded === key ? null : key); setSelected({}); };
+  const toggleRow = (idx) => setSelected(prev => ({ ...prev, [idx]: !prev[idx] }));
+  const toggleAll = (key) => {
+    const rows = state[key] || [];
+    const allSelected = rows.length > 0 && rows.every((_, i) => selected[i]);
+    if (allSelected) setSelected({});
+    else { const s = {}; rows.forEach((_, i) => { s[i] = true; }); setSelected(s); }
+  };
+  const deleteSelected = (key) => {
+    const indices = Object.keys(selected).filter(i => selected[i]).map(Number);
+    if (indices.length === 0) return;
+    dispatch({ type: 'DELETE_ROWS', source: key, indices });
+    setSelected({});
+  };
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+
+  // Get display columns for a dataset (first 4-5 meaningful fields)
+  const getDisplayCols = (key) => {
+    const schema = DATASET_SCHEMAS[key];
+    if (!schema) return [];
+    return schema.fields.slice(0, 6);
+  };
+
+  const formatCell = (v) => {
+    if (v === null || v === undefined) return '—';
+    if (typeof v === 'number') return v.toLocaleString('en-GB', { maximumFractionDigits: 2 });
+    return String(v);
+  };
+
+  if (datasets.length === 0) return null;
+
+  return (
+    <div style={{ background: C.cardBg, borderRadius: 6, padding: 16, border: `1px solid ${C.cardBorder}` }}>
+      <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: C.textPrimary }}>Imported Data</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {datasets.map(d => (
+          <div key={d.key}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: expanded === d.key ? '#E8F0EB' : C.pageBg, borderRadius: 4, cursor: 'pointer', transition: 'background 0.15s' }} onClick={() => toggleExpand(d.key)}>
+              <span style={{ fontSize: 12, color: C.textTertiary }}>{expanded === d.key ? '▼' : '▶'}</span>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: C.textPrimary }}>{d.label}</span>
+              <span style={{ fontSize: 12, color: C.textSecondary, background: '#E5E5EB', padding: '2px 8px', borderRadius: 10 }}>{d.count} rows</span>
+              <button onClick={(e) => { e.stopPropagation(); if (confirm(`Clear all ${d.label} data?`)) dispatch({ type: 'CLEAR_DATASET', source: d.key }); }} style={{ fontSize: 11, color: C.danger, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Clear</button>
+            </div>
+            {expanded === d.key && (
+              <div style={{ marginTop: 4, border: `1px solid ${C.cardBorder}`, borderRadius: 4, overflow: 'hidden' }}>
+                {selectedCount > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: '#FEF3C7', borderBottom: `1px solid ${C.cardBorder}` }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>{selectedCount} selected</span>
+                    <button onClick={() => deleteSelected(d.key)} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 3, border: 'none', background: C.danger, color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Delete Selected</button>
+                    <button onClick={() => setSelected({})} style={{ fontSize: 11, color: C.textTertiary, background: 'none', border: 'none', cursor: 'pointer' }}>Deselect</button>
+                  </div>
+                )}
+                <div style={{ overflowX: 'auto', maxHeight: 350 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                    <thead>
+                      <tr style={{ background: '#F8F9FA', position: 'sticky', top: 0 }}>
+                        <th style={{ padding: '6px 8px', textAlign: 'center', borderBottom: `1px solid ${C.cardBorder}`, width: 30 }}>
+                          <input type="checkbox" checked={state[d.key]?.length > 0 && state[d.key].every((_, i) => selected[i])} onChange={() => toggleAll(d.key)} />
+                        </th>
+                        <th style={{ padding: '6px 8px', textAlign: 'center', borderBottom: `1px solid ${C.cardBorder}`, color: C.textTertiary, width: 30 }}>#</th>
+                        {getDisplayCols(d.key).map(col => (
+                          <th key={col} style={{ padding: '6px 8px', textAlign: 'left', borderBottom: `1px solid ${C.cardBorder}`, color: C.textSecondary, fontWeight: 600, whiteSpace: 'nowrap' }}>{col}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(state[d.key] || []).map((row, i) => (
+                        <tr key={i} style={{ background: selected[i] ? '#FEF3C7' : i % 2 === 0 ? '#fff' : '#FAFAFA', cursor: 'pointer', transition: 'background 0.1s' }} onClick={() => toggleRow(i)}>
+                          <td style={{ padding: '5px 8px', textAlign: 'center', borderBottom: `1px solid ${C.divider}` }}>
+                            <input type="checkbox" checked={!!selected[i]} onChange={() => toggleRow(i)} onClick={e => e.stopPropagation()} />
+                          </td>
+                          <td style={{ padding: '5px 8px', textAlign: 'center', borderBottom: `1px solid ${C.divider}`, color: C.textTertiary }}>{i + 1}</td>
+                          {getDisplayCols(d.key).map(col => (
+                            <td key={col} style={{ padding: '5px 8px', borderBottom: `1px solid ${C.divider}`, color: C.textPrimary, whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatCell(row[col])}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
   const connStr = getNeonConnection();
   const username = currentUser?.displayName || 'Anonymous';
@@ -5023,6 +5174,7 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <AIDataImporter dispatch={dispatch} onOpenSettings={onOpenSettings} onLogImport={handleLogImport} dashboardState={state} />
+      <DataManager state={state} dispatch={dispatch} />
       <ChannelCostEntryForm dispatch={dispatch} existingCosts={state.channelCosts} />
       <ImportActivityLog logs={importLogs} onClear={clearLogs} currentUser={currentUser} />
       <h3 style={{ margin: '12px 0 0', fontSize: 15, fontWeight: 600, color: C.textPrimary }}>Manual CSV Upload</h3>
@@ -5094,8 +5246,20 @@ export default function App() {
     }
     if (action.type === 'CLEAR_ALL') {
       dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Clear All Data', category: 'system', detail: 'All data cleared', user } });
-      // Clear all Neon data
       if (conn) DATA_KEYS.forEach(key => saveDashboardData(conn, key, []));
+    }
+    if (action.type === 'CLEAR_DATASET') {
+      dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Dataset Cleared', category: action.source, detail: `Cleared all ${action.source} data`, user } });
+      if (conn && DATA_KEYS.includes(action.source)) saveDashboardData(conn, action.source, []);
+    }
+    if (action.type === 'DELETE_ROWS') {
+      dispatch({ type: 'LOG_ACTIVITY', payload: { action: 'Rows Deleted', category: action.source, detail: `Deleted ${action.indices.length} row(s) from ${action.source}`, user } });
+      // Persist updated array
+      if (conn && DATA_KEYS.includes(action.source)) {
+        const idxSet = new Set(action.indices);
+        const updated = (stateRef.current[action.source] || []).filter((_, i) => !idxSet.has(i));
+        saveDashboardData(conn, action.source, updated);
+      }
     }
   }, [currentUser]);
 
