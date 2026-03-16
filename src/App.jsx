@@ -1497,7 +1497,7 @@ RULES:
   const importData = () => {
     if (!preview) return;
     dispatch({ type: 'LOAD_DATA', source: selectedDataset, payload: preview });
-    if (onLogImport) onLogImport({ dataset: schema.label, datasetKey: selectedDataset, inputMode, rowCount: preview.length, summary: summary || `${preview.length} rows imported` });
+    if (onLogImport) onLogImport({ dataset: schema.label, datasetKey: selectedDataset, inputMode, rowCount: preview.length, summary: summary || `${preview.length} rows imported`, importedRows: preview });
     setPreview(null); setSummary(null); setRawInput(''); setImageData(null); setImagePreviewUrl(null); setError(null);
   };
 
@@ -1625,7 +1625,7 @@ function timeAgo(dateStr) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function ImportActivityLog({ logs, onClear, currentUser }) {
+function ImportActivityLog({ logs, onClear, currentUser, dispatch, state, onReloadLogs }) {
   const [expandedId, setExpandedId] = useState(null);
   const [comments, setComments] = useState({});
   const [commentText, setCommentText] = useState('');
@@ -1671,6 +1671,28 @@ function ImportActivityLog({ logs, onClear, currentUser }) {
     if (logId && connStr) loadComments(logId);
   };
 
+  const reverseImport = async (log) => {
+    const datasetKey = log.dataset_key;
+    let importedRows = log.imported_data;
+    if (!datasetKey || !importedRows || !Array.isArray(importedRows) || importedRows.length === 0) {
+      alert('Cannot reverse: no imported data snapshot stored for this import.');
+      return;
+    }
+    if (!confirm(`Reverse this import? This will remove ${importedRows.length} row(s) from ${log.dataset}.`)) return;
+    // Remove matching rows from current state by deep comparison
+    const current = state[datasetKey] || [];
+    const toRemove = new Set(importedRows.map(r => JSON.stringify(r)));
+    const updated = current.filter(row => !toRemove.has(JSON.stringify(row)));
+    dispatch({ type: 'LOAD_DATA', source: datasetKey, payload: updated });
+    // Mark as reversed in Neon
+    if (connStr && log.id) {
+      try {
+        await neonQuery(connStr, 'UPDATE import_log SET reversed = TRUE WHERE id = $1', [log.id]);
+      } catch (_) {}
+    }
+    if (onReloadLogs) onReloadLogs();
+  };
+
   if (!logs || logs.length === 0) return (
     <div style={{ background: C.cardBg, borderRadius: 6, padding: 20, border: `1px solid ${C.cardBorder}` }}>
       <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: C.textPrimary }}>Import Activity Log</h3>
@@ -1699,12 +1721,21 @@ function ImportActivityLog({ logs, onClear, currentUser }) {
                   <span style={{ fontSize: 11, color: C.textSecondary, background: C.divider, padding: '2px 6px', borderRadius: 4 }}>{MODE_LABELS[log.input_mode] || log.input_mode}</span>
                   <span style={{ fontSize: 11, color: C.textSecondary }}>{log.row_count} rows</span>
                   {ccnt > 0 && <span style={{ fontSize: 10, color: C.primary, fontWeight: 700 }}>{ccnt} comment{ccnt !== 1 ? 's' : ''}</span>}
+                  {log.reversed && <span style={{ fontSize: 10, color: C.danger, fontWeight: 700, background: '#FEE2E2', padding: '1px 6px', borderRadius: 4 }}>Reversed</span>}
                   <span style={{ fontSize: 11, color: C.textTertiary, marginLeft: 'auto' }}>by {log.imported_by}</span>
                 </div>
               </div>
               {isExpanded && (
                 <div style={{ padding: '0 12px 12px', borderTop: `1px solid ${C.divider}` }}>
                   {log.summary && <p style={{ margin: '8px 0', fontSize: 12, color: C.textSecondary, lineHeight: 1.4 }}>{log.summary}</p>}
+                  {/* Reverse import button */}
+                  <div style={{ margin: '8px 0', display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {log.reversed ? (
+                      <span style={{ fontSize: 11, color: C.textTertiary, fontStyle: 'italic' }}>Reversed</span>
+                    ) : (
+                      <button onClick={(e) => { e.stopPropagation(); reverseImport(log); }} style={{ padding: '5px 14px', borderRadius: 4, border: `1px solid ${C.danger}`, background: 'transparent', color: C.danger, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Reverse Import</button>
+                    )}
+                  </div>
                   {/* Comments thread */}
                   <div style={{ marginTop: 8 }}>
                     {logComments.length > 0 && (
@@ -1795,8 +1826,13 @@ async function initNeonTables(connectionString) {
     row_count INT NOT NULL,
     summary TEXT,
     imported_by TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    dataset_key TEXT,
+    imported_data JSONB
   )`;
+  await sql`ALTER TABLE import_log ADD COLUMN IF NOT EXISTS dataset_key TEXT`;
+  await sql`ALTER TABLE import_log ADD COLUMN IF NOT EXISTS imported_data JSONB`;
+  await sql`ALTER TABLE import_log ADD COLUMN IF NOT EXISTS reversed BOOLEAN DEFAULT FALSE`;
   await sql`CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
@@ -5151,14 +5187,15 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
 
   useEffect(() => { loadLogs(); }, [loadLogs]);
 
-  const handleLogImport = useCallback(async ({ dataset, inputMode, rowCount, summary }) => {
-    const entry = { dataset, input_mode: inputMode, row_count: rowCount, summary, imported_by: username, created_at: new Date().toISOString() };
+  const handleLogImport = useCallback(async ({ dataset, datasetKey, inputMode, rowCount, summary, importedRows }) => {
+    const entry = { dataset, dataset_key: datasetKey, input_mode: inputMode, row_count: rowCount, summary, imported_by: username, created_at: new Date().toISOString() };
     if (connStr) {
       try {
-        await neonQuery(connStr, 'INSERT INTO import_log (dataset, input_mode, row_count, summary, imported_by) VALUES ($1, $2, $3, $4, $5)', [dataset, inputMode, rowCount, summary, username]);
+        await neonQuery(connStr, 'INSERT INTO import_log (dataset, dataset_key, input_mode, row_count, summary, imported_by, imported_data) VALUES ($1, $2, $3, $4, $5, $6, $7)', [dataset, datasetKey, inputMode, rowCount, summary, username, JSON.stringify(importedRows || [])]);
       } catch (_) { /* fall through to localStorage */ }
     }
     // Always save to localStorage as backup
+    entry.imported_data = importedRows || [];
     const local = JSON.parse(localStorage.getItem('crm_import_log') || '[]');
     local.unshift(entry);
     localStorage.setItem('crm_import_log', JSON.stringify(local.slice(0, 100)));
@@ -5176,7 +5213,7 @@ function DataImportSection({ state, dispatch, onOpenSettings, currentUser }) {
       <AIDataImporter dispatch={dispatch} onOpenSettings={onOpenSettings} onLogImport={handleLogImport} dashboardState={state} />
       <DataManager state={state} dispatch={dispatch} />
       <ChannelCostEntryForm dispatch={dispatch} existingCosts={state.channelCosts} />
-      <ImportActivityLog logs={importLogs} onClear={clearLogs} currentUser={currentUser} />
+      <ImportActivityLog logs={importLogs} onClear={clearLogs} currentUser={currentUser} dispatch={dispatch} state={state} onReloadLogs={loadLogs} />
       <h3 style={{ margin: '12px 0 0', fontSize: 15, fontWeight: 600, color: C.textPrimary }}>Manual CSV Upload</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
         <CSVUploader label="Email & Flows Data" source="emailFlows" requiredHeaders={['week','type','sends','revenue']} dispatch={dispatch} />
