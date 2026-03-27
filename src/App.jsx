@@ -501,7 +501,20 @@ function reducer(state, action) {
   switch (action.type) {
     case 'SET_TAB': return { ...state, activeTab: action.payload };
     case 'LOAD_DATA': return { ...state, [action.source]: action.payload, lastUpdated: { ...state.lastUpdated, [action.source]: new Date().toLocaleString('en-GB') } };
-    case 'APPEND_DATA': return { ...state, [action.source]: [...(state[action.source] || []), ...action.payload], lastUpdated: { ...state.lastUpdated, [action.source]: new Date().toLocaleString('en-GB') } };
+    case 'APPEND_DATA': {
+      const _SF = new Set(['week','month','flowName','type','testName','activity','metric','channel','notes','name','productName']);
+      const coerced = (action.payload || []).map(row => {
+        const out = { ...row };
+        Object.keys(out).forEach(k => {
+          if (!_SF.has(k) && out[k] !== null && out[k] !== undefined && typeof out[k] === 'string') {
+            const n = Number(out[k].replace(/[£$€,\s]/g, ''));
+            if (!isNaN(n)) out[k] = n;
+          }
+        });
+        return out;
+      });
+      return { ...state, [action.source]: [...(state[action.source] || []), ...coerced], lastUpdated: { ...state.lastUpdated, [action.source]: new Date().toLocaleString('en-GB') } };
+    }
     case 'RESET_DEMO': return { ...initialState, activeTab: state.activeTab, settingsOpen: state.settingsOpen, tabPeriods: state.tabPeriods };
     case 'CLEAR_ALL': return { ...state, emailFlows: [], loyalty: [], segments: [], outreach: [], beforeAfter: [], holdoutTests: [], activityROI: [], revenue: [], subscriptions: [], milestoneProducts: [], whatsappFlows: [], postcardFlows: [], channelCosts: [], productChurn: [], lastUpdated: Object.fromEntries(Object.keys(state.lastUpdated).map(k => [k, 'Cleared'])) };
     case 'CLEAR_DATASET': return { ...state, [action.source]: [], lastUpdated: { ...state.lastUpdated, [action.source]: 'Cleared' } };
@@ -1423,6 +1436,11 @@ function AIDataImporter({ dispatch, onOpenSettings, onLogImport, dashboardState 
     loyalty: `\n\nDATA MODEL:\n- Each row = one month of milestone/loyalty program data\n- "month" = YYYY-MM format`,
     segments: `\n\nDATA MODEL:\n- Each row = one month of customer segment data\n- "month" = YYYY-MM format`,
     subscriptions: `\n\nDATA MODEL:\n- Each row = one month of subscription metrics\n- "month" = YYYY-MM format\n- churnRate should be a decimal (e.g. 0.05 for 5%)`,
+    whatsappFlows: `\n\nDATA MODEL:\n- Each row = ONE WhatsApp flow for ONE week\n- "week" = Monday date (YYYY-MM-DD)\n- "flowName" = exact flow/automation name\n- Numeric fields (sends, delivered, responses, conversions, revenue, cost) must be numbers, not strings\n- Revenue and cost in GBP, raw numbers`,
+    postcardFlows: `\n\nDATA MODEL:\n- Each row = ONE postcard flow for ONE week\n- "week" = Monday date (YYYY-MM-DD)\n- "flowName" = exact flow name\n- Numeric fields must be numbers`,
+    beforeAfter: `\n\nDATA MODEL:\n- Each row = one before/after comparison for a specific activity and metric\n- beforeValue, afterValue are numbers; lift is a decimal (0.15 = 15% lift)`,
+    holdoutTests: `\n\nDATA MODEL:\n- Each row = one holdout test result\n- Rates are decimals (0.05 = 5%), revenue is in GBP`,
+    activityROI: `\n\nDATA MODEL:\n- Each row = ROI for one CRM activity\n- totalCost, incrementalRevenue in GBP; incrementalROI as multiplier (e.g. 3.5)`,
   };
 
   const modelHint = dataModelHints[selectedDataset] || '';
@@ -1472,6 +1490,19 @@ RULES:
       if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error?.message || `API error ${resp.status}`); }
       const data = await resp.json();
       const text = data.content?.[0]?.text || '';
+      // Coerce numeric fields to actual numbers
+      const STRING_FIELDS = new Set(['week','month','flowName','type','testName','activity','metric','channel','notes','name','productName']);
+      const coerceRows = (rows) => rows.map(row => {
+        const out = { ...row };
+        Object.keys(out).forEach(k => {
+          if (!STRING_FIELDS.has(k) && out[k] !== null && out[k] !== undefined && typeof out[k] === 'string') {
+            const cleaned = out[k].replace(/[£$€,\s]/g, '');
+            const n = Number(cleaned);
+            if (!isNaN(n)) out[k] = n;
+          }
+        });
+        return out;
+      });
       // Try parsing as {summary, data} object first, fall back to raw array
       const objMatch = text.match(/\{[\s\S]*\}/);
       if (objMatch) {
@@ -1479,7 +1510,7 @@ RULES:
           const obj = JSON.parse(objMatch[0]);
           if (obj.data && Array.isArray(obj.data)) {
             setSummary(obj.summary || null);
-            setPreview(obj.data);
+            setPreview(coerceRows(obj.data));
             return;
           }
         } catch (_) { /* fall through to array parsing */ }
@@ -1488,7 +1519,7 @@ RULES:
       if (!jsonMatch) throw new Error('AI did not return valid JSON');
       const parsed = JSON.parse(jsonMatch[0]);
       setSummary(null);
-      setPreview(parsed);
+      setPreview(coerceRows(parsed));
     } catch (err) {
       setError(err.message);
     } finally { setLoading(false); }
