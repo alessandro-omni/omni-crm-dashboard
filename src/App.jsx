@@ -1485,7 +1485,7 @@ RULES:
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 8192, system: systemPrompt, messages }),
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 100000, system: systemPrompt, messages }),
       });
       if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error?.message || `API error ${resp.status}`); }
       const data = await resp.json();
